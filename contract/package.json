@@ -1,0 +1,34 @@
+{
+  "name": "contract",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "",
+  "author": "Haruki Kondo",
+  "engines": {
+    "node": ">=23"
+  },
+  "scripts": {
+    "format": "npx solhint --fix --noPrompt 'contracts/**/*.sol' && bunx prettier . --write",
+    "clean": "npx hardhat clean",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "verify": "npx hardhat ignition verify",
+    "coverage": "SOLIDITY_COVERAGE=true npx hardhat coverage",
+    "deploy:Storage": "npx hardhat ignition deploy ./ignition/modules/Storage.ts --verify",
+    "local": "npx hardhat node",
+    "getBalance": "npx hardhat getBalance",
+    "getChainInfo": "npx hardhat getChainInfo",
+    "getUsdcBalance": "npx hardhat getUsdcBalance",
+    "transferUsdc": "npx hardhat transferUsdc"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "^4.1.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "base64-sol": "^1.1.0",
+    "dotenv": "^17.2.1",
+    "hardhat": "^2.26.1",
+    "prettierrc": "^0.0.0-5",
+    "solhint": "^5.0.4"
+  }
+}
