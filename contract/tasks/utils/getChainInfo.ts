@@ -1,32 +1,47 @@
 import { task } from "hardhat/config";
-import type { HardhatRuntimeEnvironment } from "hardhat/types";
-import { formatEther } from "viem";
+import {
+  createDynamicPublicClient,
+  logChainInfo,
+  verifyChainId,
+} from "../../utils/chainUtils";
 
-/**
- * 【Task】	getChainInfo of connected chain
- */
-task("getChainInfo", "getChainInfo of connected chain").setAction(
-  async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    console.log(
-      "################################### [START] ###################################"
-    );
+task("getChainInfo", "Get current chain information and verify chain ID")
+  .addOptionalParam(
+    "chain",
+    "The chain name to check (defaults to network name or env variable)"
+  )
+  .setAction(async (taskArgs, hre) => {
+    const chainName =
+      taskArgs.chain || hre.network.name || process.env.CHAIN_NAME;
 
-    const publicClient = await hre.viem.getPublicClient();
-    const chainId = await publicClient.getChainId();
-    const blockNumber = await publicClient.getBlockNumber();
-    const count = await publicClient.getBlockTransactionCount();
-    const gasPrice = await publicClient.getGasPrice();
-    const gasPriceInEther = formatEther(gasPrice);
+    console.log("🌐 Getting chain information...");
+    console.log(`Hardhat Network: ${hre.network.name}`);
+    console.log(`Specified Chain: ${chainName}`);
 
-    console.log(`
-      Chain ID: ${chainId}
-      Block Number: ${blockNumber}
-      Transaction Count: ${count}
-      Gas Price: ${gasPriceInEther} ETH
-    `);
+    // Display configured chain info
+    logChainInfo(chainName);
 
-    console.log(
-      "################################### [END] ###################################"
-    );
-  }
-);
+    // Verify actual chain ID matches expectation
+    console.log("\n🔍 Verifying chain ID...");
+    const isValid = await verifyChainId(chainName);
+
+    if (isValid) {
+      console.log("✅ Chain configuration is correct!");
+    } else {
+      console.log("❌ Chain configuration mismatch!");
+      process.exit(1);
+    }
+
+    // Get additional network info
+    try {
+      const client = createDynamicPublicClient(chainName);
+      const blockNumber = await client.getBlockNumber();
+      const gasPrice = await client.getGasPrice();
+
+      console.log("\n📊 Network Status:");
+      console.log(`   Latest Block: ${blockNumber}`);
+      console.log(`   Gas Price: ${gasPrice} wei`);
+    } catch (error) {
+      console.log("⚠️  Could not fetch network status:", error.message);
+    }
+  });

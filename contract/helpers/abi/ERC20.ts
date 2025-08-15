@@ -1,4 +1,4 @@
-// ERC20 ABI for transfer, balance, and decimals
+// ERC20 ABI for transfer, balance, decimals, approve, and symbol
 export const ERC20_ABI = [
   {
     inputs: [
@@ -6,6 +6,16 @@ export const ERC20_ABI = [
       { name: "amount", type: "uint256" },
     ],
     name: "transfer",
+    outputs: [{ name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    name: "approve",
     outputs: [{ name: "", type: "bool" }],
     stateMutability: "nonpayable",
     type: "function",
@@ -28,6 +38,16 @@ export const ERC20_ABI = [
     inputs: [],
     name: "symbol",
     outputs: [{ name: "", type: "string" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    name: "allowance",
+    outputs: [{ name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
