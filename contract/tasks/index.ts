@@ -12,7 +12,6 @@ import "./usdcRewardContract/pauseContract";
 import "./usdcRewardContract/removePoints";
 import "./usdcRewardContract/setExchangeRate";
 import "./usdcRewardContract/transferOwnership";
-import "./usdcRewardContract/transferPoints";
 import "./usdcRewardContract/unpauseContract";
 import "./usdcRewardContract/withdrawUSDC";
 

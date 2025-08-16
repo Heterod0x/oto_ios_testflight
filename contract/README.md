@@ -232,7 +232,6 @@ bun run deploy:localhost
 
 - `addPoints(address user, uint256 amount)`: ユーザーにポイントを追加
 - `removePoints(address user, uint256 amount)`: ユーザーからポイントを削除
-- `transferPoints(address user, uint256 amount)`: ユーザーにポイントを送金
 - `setExchangeRate(uint256 rate)`: 交換レートを設定
 - `depositUSDC(uint256 amount)`: コントラクトに USDC を入金
 - `withdrawUSDC(uint256 amount)`: コントラクトから USDC を出金
@@ -248,7 +247,7 @@ bun run deploy:localhost
 ### イベント
 
 - `PointsAdded(address indexed user, uint256 amount)`
-- `PointsTransferred(address indexed user, uint256 amount)`
+- `PointsRemoved(address indexed user, uint256 amount)`
 - `ExchangeRateSet(uint256 newRate)`
 - `USDCClaimed(address indexed user, uint256 pointsUsed, uint256 usdcAmount)`
 - `USDCDeposited(uint256 amount)`

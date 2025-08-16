@@ -26,7 +26,6 @@
     "transferUsdc": "npx hardhat transferUsdc",
     "addPoints": "npx hardhat addPoints",
     "removePoints": "npx hardhat removePoints",
-    "transferPoints": "npx hardhat transferPoints",
     "setExchangeRate": "npx hardhat setExchangeRate",
     "depositUSDC": "npx hardhat depositUSDC",
     "withdrawUSDC": "npx hardhat withdrawUSDC",

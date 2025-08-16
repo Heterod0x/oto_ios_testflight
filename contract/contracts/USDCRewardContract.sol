@@ -57,11 +57,6 @@ contract USDCRewardContract is Ownable, Pausable, ReentrancyGuard {
   /// @param amount The amount of points added
   event PointsAdded(address indexed user, uint256 amount);
 
-  /// @dev Emitted when points are transferred to a user
-  /// @param user The user address
-  /// @param amount The amount of points transferred
-  event PointsTransferred(address indexed user, uint256 amount);
-
   /// @dev Emitted when points are removed from a user's balance
   /// @param user The user address
   /// @param amount The amount of points removed
@@ -123,26 +118,6 @@ contract USDCRewardContract is Ownable, Pausable, ReentrancyGuard {
     pointBalances[user] += amount;
 
     emit PointsAdded(user, amount);
-  }
-
-  /// @dev Transfers points to a user (only owner)
-  /// @param user The user address to transfer points to
-  /// @param amount The amount of points to transfer
-  function transferPoints(address user, uint256 amount) external onlyOwner {
-    _validateAddress(user);
-
-    if (amount == 0) {
-      revert InvalidAmount();
-    }
-
-    uint256 currentBalance = pointBalances[user];
-    if (currentBalance < amount) {
-      revert InsufficientPoints(amount, currentBalance);
-    }
-
-    pointBalances[user] -= amount;
-
-    emit PointsTransferred(user, amount);
   }
 
   /// @dev Removes points from a user's balance (only owner)

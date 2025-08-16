@@ -143,137 +143,6 @@ describe("USDCRewardContract", function () {
       });
     });
 
-    describe("transferPoints", function () {
-      it("should allow owner to transfer points from user", async function () {
-        const { usdcRewardContract, user1, publicClient } = await loadFixture(
-          deployContractsFixture
-        );
-
-        const initialPoints = 1000n;
-        const transferAmount = 300n;
-
-        // First add points
-        let hash = await usdcRewardContract.write.addPoints([
-          user1.account.address,
-          initialPoints,
-        ]);
-        await publicClient.waitForTransactionReceipt({ hash });
-
-        // Then transfer points
-        hash = await usdcRewardContract.write.transferPoints([
-          user1.account.address,
-          transferAmount,
-        ]);
-        await publicClient.waitForTransactionReceipt({ hash });
-
-        // Check remaining balance
-        const balance = await usdcRewardContract.read.getPointBalance([
-          user1.account.address,
-        ]);
-        expect(balance).to.equal(initialPoints - transferAmount);
-      });
-
-      it("should emit PointsTransferred event", async function () {
-        const { usdcRewardContract, user1, publicClient } = await loadFixture(
-          deployContractsFixture
-        );
-
-        const initialPoints = 1000n;
-        const transferAmount = 300n;
-
-        // Add points first
-        let hash = await usdcRewardContract.write.addPoints([
-          user1.account.address,
-          initialPoints,
-        ]);
-        await publicClient.waitForTransactionReceipt({ hash });
-
-        // Transfer points
-        hash = await usdcRewardContract.write.transferPoints([
-          user1.account.address,
-          transferAmount,
-        ]);
-
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
-        // Check for PointsTransferred event
-        const logs = await publicClient.getLogs({
-          address: usdcRewardContract.address,
-          fromBlock: receipt.blockNumber,
-          toBlock: receipt.blockNumber,
-        });
-
-        expect(logs).to.have.length(1);
-      });
-
-      it("should revert when non-owner tries to transfer points", async function () {
-        const { usdcRewardContract, user1, nonOwner } = await loadFixture(
-          deployContractsFixture
-        );
-
-        await expect(
-          usdcRewardContract.write.transferPoints(
-            [user1.account.address, 100n],
-            { account: nonOwner.account }
-          )
-        ).to.be.rejectedWith("OwnableUnauthorizedAccount");
-      });
-
-      it("should revert when transferring from zero address", async function () {
-        const { usdcRewardContract } = await loadFixture(
-          deployContractsFixture
-        );
-
-        await expect(
-          usdcRewardContract.write.transferPoints([zeroAddress, 100n])
-        ).to.be.rejectedWith("InvalidAddress");
-      });
-
-      it("should revert when transferring zero points", async function () {
-        const { usdcRewardContract, user1 } = await loadFixture(
-          deployContractsFixture
-        );
-
-        await expect(
-          usdcRewardContract.write.transferPoints([user1.account.address, 0n])
-        ).to.be.rejectedWith("InvalidAmount");
-      });
-
-      it("should revert when user has insufficient points", async function () {
-        const { usdcRewardContract, user1, publicClient } = await loadFixture(
-          deployContractsFixture
-        );
-
-        const initialPoints = 100n;
-        const transferAmount = 200n;
-
-        // Add some points
-        const hash = await usdcRewardContract.write.addPoints([
-          user1.account.address,
-          initialPoints,
-        ]);
-        await publicClient.waitForTransactionReceipt({ hash });
-
-        // Try to transfer more than available
-        await expect(
-          usdcRewardContract.write.transferPoints([
-            user1.account.address,
-            transferAmount,
-          ])
-        ).to.be.rejectedWith("InsufficientPoints");
-      });
-
-      it("should revert when user has no points", async function () {
-        const { usdcRewardContract, user1 } = await loadFixture(
-          deployContractsFixture
-        );
-
-        await expect(
-          usdcRewardContract.write.transferPoints([user1.account.address, 100n])
-        ).to.be.rejectedWith("InsufficientPoints");
-      });
-    });
-
     describe("removePoints", function () {
       it("should allow owner to remove points from user", async function () {
         const { usdcRewardContract, user1, publicClient } = await loadFixture(
@@ -436,13 +305,13 @@ describe("USDCRewardContract", function () {
         expect(balance).to.equal(pointsToAdd);
       });
 
-      it("should return correct balance after transferring points", async function () {
+      it("should return correct balance after removing points", async function () {
         const { usdcRewardContract, user1, publicClient } = await loadFixture(
           deployContractsFixture
         );
 
         const initialPoints = 1000n;
-        const transferAmount = 400n;
+        const removeAmount = 400n;
 
         // Add points
         let hash = await usdcRewardContract.write.addPoints([
@@ -451,17 +320,17 @@ describe("USDCRewardContract", function () {
         ]);
         await publicClient.waitForTransactionReceipt({ hash });
 
-        // Transfer points
-        hash = await usdcRewardContract.write.transferPoints([
+        // Remove points
+        hash = await usdcRewardContract.write.removePoints([
           user1.account.address,
-          transferAmount,
+          removeAmount,
         ]);
         await publicClient.waitForTransactionReceipt({ hash });
 
         const balance = await usdcRewardContract.read.getPointBalance([
           user1.account.address,
         ]);
-        expect(balance).to.equal(initialPoints - transferAmount);
+        expect(balance).to.equal(initialPoints - removeAmount);
       });
     });
   });
@@ -1660,13 +1529,13 @@ describe("USDCRewardContract", function () {
         ).to.be.rejectedWith("InvalidAddress");
       });
 
-      it("should revert when transferring points from zero address", async function () {
+      it("should revert when removing points from zero address", async function () {
         const { usdcRewardContract } = await loadFixture(
           deployContractsFixture
         );
 
         await expect(
-          usdcRewardContract.write.transferPoints([zeroAddress, 1000n])
+          usdcRewardContract.write.removePoints([zeroAddress, 1000n])
         ).to.be.rejectedWith("InvalidAddress");
       });
 
@@ -1692,7 +1561,7 @@ describe("USDCRewardContract", function () {
 
         // The claimUSDC function validates msg.sender internally, so we can't directly test with zero address
         // Instead, we test that the function properly validates addresses in general
-        // This test is covered by the other zero address tests for addPoints and transferPoints
+        // This test is covered by the other zero address tests for addPoints and removePoints
         expect(true).to.be.true; // Placeholder - the validation is tested elsewhere
       });
     });
@@ -1708,13 +1577,13 @@ describe("USDCRewardContract", function () {
         ).to.be.rejectedWith("InvalidAmount");
       });
 
-      it("should revert when transferring zero points", async function () {
+      it("should revert when removing zero points", async function () {
         const { usdcRewardContract, user1 } = await loadFixture(
           deployContractsFixture
         );
 
         await expect(
-          usdcRewardContract.write.transferPoints([user1.account.address, 0n])
+          usdcRewardContract.write.removePoints([user1.account.address, 0n])
         ).to.be.rejectedWith("InvalidAmount");
       });
 
@@ -1847,9 +1716,9 @@ describe("USDCRewardContract", function () {
         ]);
         await publicClient.waitForTransactionReceipt({ hash });
 
-        // Try to transfer more than available
+        // Try to remove more than available
         await expect(
-          usdcRewardContract.write.transferPoints([
+          usdcRewardContract.write.removePoints([
             user1.account.address,
             pointsToTransfer,
           ])
@@ -1889,7 +1758,7 @@ describe("USDCRewardContract", function () {
         ).to.be.rejectedWith("InvalidAddress");
 
         await expect(
-          usdcRewardContract.write.transferPoints([zeroAddress, 1000n])
+          usdcRewardContract.write.removePoints([zeroAddress, 1000n])
         ).to.be.rejectedWith("InvalidAddress");
       });
 
@@ -1903,7 +1772,7 @@ describe("USDCRewardContract", function () {
         ).to.be.rejectedWith("InvalidAmount");
 
         await expect(
-          usdcRewardContract.write.transferPoints([user1.account.address, 0n])
+          usdcRewardContract.write.removePoints([user1.account.address, 0n])
         ).to.be.rejectedWith("InvalidAmount");
 
         await expect(
@@ -2080,8 +1949,8 @@ describe("USDCRewardContract", function () {
         });
         await publicClient.waitForTransactionReceipt({ hash });
 
-        // Transfer some points from user2
-        hash = await usdcRewardContract.write.transferPoints([
+        // Remove some points from user2
+        hash = await usdcRewardContract.write.removePoints([
           user2.account.address,
           200n,
         ]);
@@ -2280,15 +2149,15 @@ describe("USDCRewardContract", function () {
         expect(finalUser2Points).to.equal(user2Points - user2Claim);
       });
 
-      it("should handle point transfers and subsequent claims correctly", async function () {
+      it("should handle point removal and subsequent claims correctly", async function () {
         const { usdcRewardContract, mockUSDC, owner, user1, publicClient } =
           await loadFixture(deployContractsFixture);
 
         const initialPoints = 2000n;
-        const transferAmount = 500n;
+        const removeAmount = 500n;
         const exchangeRate = 1000000n;
         const usdcToDeposit = 5000000000n;
-        const claimAmount = 800n; // Less than remaining after transfer
+        const claimAmount = 800n; // Less than remaining after removal
 
         // Setup
         let hash = await usdcRewardContract.write.setExchangeRate([
@@ -2312,19 +2181,19 @@ describe("USDCRewardContract", function () {
         ]);
         await publicClient.waitForTransactionReceipt({ hash });
 
-        // Transfer some points away
-        hash = await usdcRewardContract.write.transferPoints([
+        // Remove some points away
+        hash = await usdcRewardContract.write.removePoints([
           user1.account.address,
-          transferAmount,
+          removeAmount,
         ]);
         await publicClient.waitForTransactionReceipt({ hash });
 
-        // Verify points after transfer
-        const pointsAfterTransfer =
+        // Verify points after removal
+        const pointsAfterRemoval =
           await usdcRewardContract.read.getPointBalance([
             user1.account.address,
           ]);
-        expect(pointsAfterTransfer).to.equal(initialPoints - transferAmount);
+        expect(pointsAfterRemoval).to.equal(initialPoints - removeAmount);
 
         // Claim USDC
         const initialUserUSDC = await mockUSDC.read.balanceOf([
@@ -2348,7 +2217,7 @@ describe("USDCRewardContract", function () {
           initialUserUSDC + claimAmount * exchangeRate
         );
         expect(finalUserPoints).to.equal(
-          initialPoints - transferAmount - claimAmount
+          initialPoints - removeAmount - claimAmount
         );
       });
 
