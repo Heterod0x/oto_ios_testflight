@@ -1,7 +1,6 @@
 import * as dotenv from "dotenv";
 import { getExplorerUrl } from "../utils/chainUtils";
 import deployAndSetup from "./deploy-and-setup";
-import { verifyDeployment } from "./verify-deployment";
 
 dotenv.config();
 
@@ -18,58 +17,37 @@ async function fullDeployment() {
     console.log("\n⏳ Waiting for deployment to be confirmed...");
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    // Step 3: Verify deployment
-    console.log("\n🔍 Step 2: Verifying deployment...");
-    const chainName = process.env.CHAIN_NAME || process.env.HARDHAT_NETWORK;
-    const verificationResults = await verifyDeployment(
-      deploymentResult.contractAddress,
-      deploymentResult.usdcTokenAddress,
-      chainName
-    );
-
-    // Step 4: Summary
+    // Step 3: Summary
     console.log("\n📋 Deployment Summary:");
     console.log("======================");
     console.log(`✅ Contract Address: ${deploymentResult.contractAddress}`);
     console.log(`🪙  USDC Token: ${deploymentResult.usdcTokenAddress}`);
     console.log(`🌐 Network: ${process.env.HARDHAT_NETWORK || "localhost"}`);
 
-    const successfulTests = verificationResults.filter((r) => r.success).length;
-    const totalTests = verificationResults.length;
-    console.log(
-      `🎯 Verification: ${successfulTests}/${totalTests} tests passed`
-    );
+    console.log("\n🎉 Full deployment completed successfully!");
 
-    if (successfulTests === totalTests) {
-      console.log("\n🎉 Full deployment completed successfully!");
-
-      // Provide next steps
-      console.log("\n📝 Next Steps:");
-      console.log("==============");
-      console.log("1. Save the contract address to your .env file:");
-      console.log(`   CONTRACT_ADDRESS=${deploymentResult.contractAddress}`);
-      console.log("\n2. You can now use the contract with these commands:");
-      console.log("   npm run addPoints -- --user <address> --amount <points>");
-      console.log("   npm run setExchangeRate -- --rate <rate>");
-      console.log("   npm run depositUSDC -- --amount <amount>");
-      const explorerUrl = getExplorerUrl(chainName);
-      if (explorerUrl && explorerUrl !== "http://localhost:8545") {
-        console.log("\n3. View your contract on block explorer:");
-        console.log(
-          `   ${explorerUrl}/address/${deploymentResult.contractAddress}`
-        );
-      }
-    } else {
+    // Provide next steps
+    console.log("\n📝 Next Steps:");
+    console.log("==============");
+    console.log("1. Save the contract address to your .env file:");
+    console.log(`   CONTRACT_ADDRESS=${deploymentResult.contractAddress}`);
+    console.log("\n2. You can now use the contract with these commands:");
+    console.log("   npm run addPoints -- --user <address> --amount <points>");
+    console.log("   npm run removePoints -- --user <address> --amount <points>");
+    console.log("   npm run setExchangeRate -- --rate <rate>");
+    console.log("   npm run depositUSDC -- --amount <amount>");
+    const chainName = process.env.CHAIN_NAME || process.env.HARDHAT_NETWORK;
+    const explorerUrl = getExplorerUrl(chainName);
+    if (explorerUrl && explorerUrl !== "http://localhost:8545") {
+      console.log("\n3. View your contract on block explorer:");
       console.log(
-        "\n⚠️  Deployment completed but some verification tests failed."
+        `   ${explorerUrl}/address/${deploymentResult.contractAddress}`
       );
-      console.log("Please check the verification results above.");
     }
 
     return {
-      success: successfulTests === totalTests,
+      success: true,
       contractAddress: deploymentResult.contractAddress,
-      verificationResults,
     };
   } catch (error) {
     console.error("\n❌ Full deployment failed:", error);

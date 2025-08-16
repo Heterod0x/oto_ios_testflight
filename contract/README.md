@@ -74,23 +74,18 @@ export USDC_TOKEN_ADDRESS=0x036CbD53842c5426634e7929541eC2318f3dCF7e
 bun run deploy:full --network base-sepolia
 ```
 
-### 手動デプロイ
-
-```bash
-# 1. コントラクトのみデプロイ
-bun run deploy:USDCReward --network base-sepolia
-
-# 2. 初期設定付きデプロイ
-bun run deploy:setup --network base-sepolia
-
-# 3. 完全デプロイ（検証付き）
-bun run deploy:full --network base-sepolia
-```
-
 ### デプロイ後に環境変数に設定
 
 ```bash
 export CONTRACT_ADDRESS=<デプロイしたアドレス>
+```
+
+さらに、 `deployed_addresses.json` に　 USDC のアドレスを設定する
+
+```json
+{
+  "USDCModule#USDC": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+}
 ```
 
 ### コントラクトの検証
@@ -115,12 +110,6 @@ bun run test
 bun run coverage
 ```
 
-### 特定のテストファイル実行
-
-```bash
-npx hardhat test test/USDCRewardContract.test.ts
-```
-
 ## 📖 コントラクトの使用方法
 
 ### 管理者機能
@@ -129,10 +118,10 @@ npx hardhat test test/USDCRewardContract.test.ts
 
 ```bash
 # ユーザーにポイントを追加
-bun run addPoints --user 0x1431ea8af860C3862A919968C71f901aEdE1910E --amount 1000 --network base-sepolia
+bun run addPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 1000 --network base-sepolia
 
 # ユーザーからポイントを削除
-bun run removePoints --user 0x1431ea8af860C3862A919968C71f901aEdE1910E --amount 500 --network base-sepolia
+bun run removePoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 500 --network base-sepolia
 ```
 
 #### 交換レート設定
@@ -171,25 +160,14 @@ bun run transferOwnership --newowner 0x1431ea8af860C3862A919968C71f901aEdE1910E 
 
 ```bash
 # ポイント残高とUSDC残高を確認
-bun run getBalances --user 0xA7C3842379b2F11F167ED1572Dd9AE910176994f --network base-sepolia
+bun run getBalances --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --network base-sepolia
 ```
 
 #### USDC 請求
 
 コントラクトの `claimUSDC` 関数を直接呼び出すか、フロントエンドアプリケーションを通じて実行します。
 
-### ユーティリティ
-
 ```bash
-# 自分のETH残高を確認
-bun run getBalance --network base-sepolia
-
-# USDC残高を確認
-bun run getUsdcBalance --network base-sepolia
-
-# ネットワーク情報を確認
-bun run getChainInfo --network base-sepolia
-
 # USDCを請求(デフォルトだと 1ポイント = 1USDC)
 bun run claimUSDC --points 1 --network base-sepolia
 ```
