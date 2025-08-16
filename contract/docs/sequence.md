@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
 participant User as ユーザー（クライアント）
 participant API as API サーバー（Owner）
@@ -75,3 +76,5 @@ participant USDC as USDC Token
             Contract-->>API: ContractUnpaused イベント
         end
     end
+
+```
