@@ -68,7 +68,7 @@ bun run compile
 ### クイックデプロイ（推奨）
 
 ```bash
-# ネットワーク毎にUSDCのコントラクトを設定
+# ネットワーク毎にUSDCのコントラクトを設定(ここの値はネットワーク毎に切り替える)
 export USDC_TOKEN_ADDRESS=0x036CbD53842c5426634e7929541eC2318f3dCF7e
 # Base Sepoliaに自動デプロイ（初期設定付き）
 bun run deploy:full --network base-sepolia
@@ -130,6 +130,9 @@ npx hardhat test test/USDCRewardContract.test.ts
 ```bash
 # ユーザーにポイントを追加
 bun run addPoints --user 0x1431ea8af860C3862A919968C71f901aEdE1910E --amount 1000 --network base-sepolia
+
+# ユーザーからポイントを削除
+bun run removePoints --user 0x1431ea8af860C3862A919968C71f901aEdE1910E --amount 500 --network base-sepolia
 ```
 
 #### 交換レート設定
@@ -228,6 +231,7 @@ bun run deploy:localhost
 #### 管理者専用関数
 
 - `addPoints(address user, uint256 amount)`: ユーザーにポイントを追加
+- `removePoints(address user, uint256 amount)`: ユーザーからポイントを削除
 - `transferPoints(address user, uint256 amount)`: ユーザーにポイントを送金
 - `setExchangeRate(uint256 rate)`: 交換レートを設定
 - `depositUSDC(uint256 amount)`: コントラクトに USDC を入金

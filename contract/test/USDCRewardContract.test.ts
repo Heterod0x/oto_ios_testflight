@@ -274,6 +274,137 @@ describe("USDCRewardContract", function () {
       });
     });
 
+    describe("removePoints", function () {
+      it("should allow owner to remove points from user", async function () {
+        const { usdcRewardContract, user1, publicClient } = await loadFixture(
+          deployContractsFixture
+        );
+
+        const initialPoints = 1000n;
+        const removeAmount = 300n;
+
+        // First add points
+        let hash = await usdcRewardContract.write.addPoints([
+          user1.account.address,
+          initialPoints,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Then remove points
+        hash = await usdcRewardContract.write.removePoints([
+          user1.account.address,
+          removeAmount,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Check remaining balance
+        const balance = await usdcRewardContract.read.getPointBalance([
+          user1.account.address,
+        ]);
+        expect(balance).to.equal(initialPoints - removeAmount);
+      });
+
+      it("should emit PointsRemoved event", async function () {
+        const { usdcRewardContract, user1, publicClient } = await loadFixture(
+          deployContractsFixture
+        );
+
+        const initialPoints = 1000n;
+        const removeAmount = 300n;
+
+        // Add points first
+        let hash = await usdcRewardContract.write.addPoints([
+          user1.account.address,
+          initialPoints,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Remove points
+        hash = await usdcRewardContract.write.removePoints([
+          user1.account.address,
+          removeAmount,
+        ]);
+
+        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+        // Check for PointsRemoved event
+        const logs = await publicClient.getLogs({
+          address: usdcRewardContract.address,
+          fromBlock: receipt.blockNumber,
+          toBlock: receipt.blockNumber,
+        });
+
+        expect(logs).to.have.length(1);
+      });
+
+      it("should revert when non-owner tries to remove points", async function () {
+        const { usdcRewardContract, user1, nonOwner } = await loadFixture(
+          deployContractsFixture
+        );
+
+        await expect(
+          usdcRewardContract.write.removePoints(
+            [user1.account.address, 100n],
+            { account: nonOwner.account }
+          )
+        ).to.be.rejectedWith("OwnableUnauthorizedAccount");
+      });
+
+      it("should revert when removing from zero address", async function () {
+        const { usdcRewardContract } = await loadFixture(
+          deployContractsFixture
+        );
+
+        await expect(
+          usdcRewardContract.write.removePoints([zeroAddress, 100n])
+        ).to.be.rejectedWith("InvalidAddress");
+      });
+
+      it("should revert when removing zero points", async function () {
+        const { usdcRewardContract, user1 } = await loadFixture(
+          deployContractsFixture
+        );
+
+        await expect(
+          usdcRewardContract.write.removePoints([user1.account.address, 0n])
+        ).to.be.rejectedWith("InvalidAmount");
+      });
+
+      it("should revert when user has insufficient points", async function () {
+        const { usdcRewardContract, user1, publicClient } = await loadFixture(
+          deployContractsFixture
+        );
+
+        const initialPoints = 100n;
+        const removeAmount = 200n;
+
+        // Add some points
+        const hash = await usdcRewardContract.write.addPoints([
+          user1.account.address,
+          initialPoints,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Try to remove more than available
+        await expect(
+          usdcRewardContract.write.removePoints([
+            user1.account.address,
+            removeAmount,
+          ])
+        ).to.be.rejectedWith("InsufficientPoints");
+      });
+
+      it("should revert when user has no points", async function () {
+        const { usdcRewardContract, user1 } = await loadFixture(
+          deployContractsFixture
+        );
+
+        await expect(
+          usdcRewardContract.write.removePoints([user1.account.address, 100n])
+        ).to.be.rejectedWith("InsufficientPoints");
+      });
+    });
+
     describe("getPointBalance", function () {
       it("should return zero for new user", async function () {
         const { usdcRewardContract, user1 } = await loadFixture(
