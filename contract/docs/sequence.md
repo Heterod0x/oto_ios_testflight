@@ -42,7 +42,7 @@ participant USDC as USDC Token
         Contract-->>API: ユーザーポイント残高
 
         alt ポイント調整が必要な場合
-            API->>Contract: removePoints(userAddress, amount)
+            API->>Contract: subtractPoints(userAddress, amount)
             Contract-->>API: PointsRemoved イベント
         end
 

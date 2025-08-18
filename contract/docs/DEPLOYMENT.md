@@ -18,7 +18,7 @@
 ```bash
 # 必須
 PRIVATE_KEY="your-private-key"
-ALCHMEY_API_KEY="your-alchemy-api-key"
+ALCHEMY_API_KEY="your-alchemy-api-key"
 USDC_TOKEN_ADDRESS="usdc-token-address-for-target-network"
 
 # オプション
@@ -168,7 +168,7 @@ npx hardhat getUsdcBalance         # USDC残高確認
 
 **解決方法:**
 
-1. `ALCHMEY_API_KEY`が正しく設定されているか確認
+1. `ALCHEMY_API_KEY`が正しく設定されているか確認
 2. ネットワークが利用可能か確認
 3. レート制限に引っかかっていないか確認
 

@@ -3,9 +3,9 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 /**
  * Task to remove points from a user's balance
- * Usage: npx hardhat removePoints --user <user_address> --amount <points_amount> --network <network>
+ * Usage: npx hardhat subtractPoints --user <user_address> --amount <points_amount> --network <network>
  */
-task("removePoints", "Remove points from a user's balance")
+task("subtractPoints", "Remove points from a user's balance")
   .addParam("user", "User address to remove points from")
   .addParam("amount", "Amount of points to remove")
   .setAction(
@@ -62,8 +62,8 @@ task("removePoints", "Remove points from a user's balance")
           );
         }
 
-        // Execute removePoints transaction
-        const hash = await contract.write.removePoints([
+        // Execute subtractPoints transaction
+        const hash = await contract.write.subtractPoints([
           user as `0x${string}`,
           pointAmount,
         ]);

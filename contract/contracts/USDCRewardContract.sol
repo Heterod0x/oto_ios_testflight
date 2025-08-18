@@ -120,10 +120,10 @@ contract USDCRewardContract is Ownable, Pausable, ReentrancyGuard {
     emit PointsAdded(user, amount);
   }
 
-  /// @dev Removes points from a user's balance (only owner)
-  /// @param user The user address to remove points from
-  /// @param amount The amount of points to remove
-  function removePoints(address user, uint256 amount) external onlyOwner {
+  /// @dev Subtracts points from a user's balance (only owner)
+  /// @param user The user address to subtract points from
+  /// @param amount The amount of points to subtract
+  function subtractPoints(address user, uint256 amount) external onlyOwner {
     _validateAddress(user);
 
     if (amount == 0) {
