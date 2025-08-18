@@ -48,11 +48,11 @@ export function getRpcUrl(chainName?: string): string {
 
   switch (chain.id) {
     case baseSepolia.id:
-      return `https://base-sepolia.g.alchemy.com/v2/${process.env.ALCHMEY_API_KEY}`;
+      return `https://base-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
     case base.id:
-      return `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHMEY_API_KEY}`;
+      return `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
     case mainnet.id:
-      return `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHMEY_API_KEY}`;
+      return `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
     case localhost.id:
       return "http://127.0.0.1:8545";
     default:

@@ -41,7 +41,7 @@ bun install
 ```bash
 # 必須設定
 PRIVATE_KEY="your-private-key-here"
-ALCHMEY_API_KEY="your-alchemy-api-key"
+ALCHEMY_API_KEY="your-alchemy-api-key"
 USDC_TOKEN_ADDRESS="0x036CbD53842c5426634e7929541eC2318f3dCF7e"  # Base Sepolia USDC
 
 # オプション設定

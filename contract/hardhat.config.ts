@@ -5,7 +5,7 @@ import "./tasks";
 
 dotenv.config();
 
-const { PRIVATE_KEY, ALCHMEY_API_KEY, BASESCAN_API_KEY } = process.env;
+const { PRIVATE_KEY, ALCHEMY_API_KEY, BASESCAN_API_KEY } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -20,17 +20,17 @@ const config: HardhatUserConfig = {
   },
   networks: {
     "base-sepolia": {
-      url: `https://base-sepolia.g.alchemy.com/v2/${ALCHMEY_API_KEY}`,
+      url: `https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
       chainId: 84532,
     },
     base: {
-      url: `https://base-mainnet.g.alchemy.com/v2/${ALCHMEY_API_KEY}`,
+      url: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
       chainId: 8453,
     },
     mainnet: {
-      url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHMEY_API_KEY}`,
+      url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
       chainId: 1,
     },
