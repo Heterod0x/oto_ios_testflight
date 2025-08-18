@@ -112,25 +112,26 @@ export default function RecordingControls({ isRecording, setRecording }: Recordi
   };
 
   return (
-    <Box className="items-center justify-center w-full min-h-80 m-4">
-      {/* Main Recording Button */}
-      <Box className="mb-0 mt-16">
-        <TouchableOpacity
-          className={`w-24 h-24 rounded-full justify-center items-center shadow-lg ${
-            recording
-              ? "bg-error-600 scale-95"
-              : "bg-background-0 border-3 border-primary-600"
-          }`}
-          onPress={recording ? handleStopRecording : handleStartRecording}
-          activeOpacity={0.8}
-        >
-          <Ionicons
-            name={recording ? "stop" : "mic"}
-            size={36}
-            color={recording ? "#ffffff" : "#4f46e5"}
-          />
-        </TouchableOpacity>
-      </Box>
+      <Box className="items-center justify-center w-full mx-4">
+        {/* Main Recording Button */}
+        <Box className="mb-0 mt-4">
+          <TouchableOpacity
+            className={`flex flex-row justify-center justify-center items-center bg-background-dark px-6 py-2 rounded-full shadow-lg ${
+              recording
+                ? "bg-error-600 scale-95"
+                : "bg-background-0 border-3 border-primary-600"
+            }`}
+            onPress={recording ? handleStopRecording : handleStartRecording}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name={recording ? "stop" : "mic"}
+              size={36}
+              color={recording ? "#ffffff" : "#ffffff"}
+            />
+            <Text size="lg" weight="bold" className="text-white font-inter tracking-wider">Allow</Text>
+          </TouchableOpacity>
+        </Box>
 
       {/* Status Section */}
       <Box className="h-10 mt-2 justify-center items-center w-full">

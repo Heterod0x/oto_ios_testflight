@@ -161,7 +161,7 @@ module.exports = {
           success: 'rgb(var(--color-background-success)/<alpha-value>)',
           info: 'rgb(var(--color-background-info)/<alpha-value>)',
           light: '#FBFBFB',
-          dark: '#181719',
+          dark: '#18181B',
         },
         indicator: {
           primary: 'rgb(var(--color-indicator-primary)/<alpha-value>)',
@@ -170,9 +170,11 @@ module.exports = {
         },
       },
       fontFamily: {
-        heading: undefined,
-        body: undefined,
+        heading: ['Inter', 'sans-serif'],
+        body: ['GeistMono_400Regular'],
         mono: undefined,
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'],
       },
       fontWeight: {
@@ -180,6 +182,7 @@ module.exports = {
       },
       fontSize: {
         '2xs': '10px',
+        '3xs': '12px',
       },
       boxShadow: {
         'hard-1': '-2px 2px 8px 0px rgba(38, 38, 38, 0.20)',
