@@ -33,7 +33,7 @@ async function fullDeployment() {
     console.log(`   CONTRACT_ADDRESS=${deploymentResult.contractAddress}`);
     console.log("\n2. You can now use the contract with these commands:");
     console.log("   npm run addPoints -- --user <address> --amount <points>");
-    console.log("   npm run removePoints -- --user <address> --amount <points>");
+    console.log("   npm run subtractPoints -- --user <address> --amount <points>");
     console.log("   npm run setExchangeRate -- --rate <rate>");
     console.log("   npm run depositUSDC -- --amount <amount>");
     const chainName = process.env.CHAIN_NAME || process.env.HARDHAT_NETWORK;

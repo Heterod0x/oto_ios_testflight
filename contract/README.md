@@ -120,8 +120,8 @@ bun run coverage
 # ユーザーにポイントを追加
 bun run addPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 1000 --network base-sepolia
 
-# ユーザーからポイントを削除
-bun run removePoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 500 --network base-sepolia
+# ユーザーからポイントを
+bun run subtractPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 500 --network base-sepolia
 ```
 
 #### 交換レート設定
@@ -209,7 +209,7 @@ bun run deploy:localhost
 #### 管理者専用関数
 
 - `addPoints(address user, uint256 amount)`: ユーザーにポイントを追加
-- `removePoints(address user, uint256 amount)`: ユーザーからポイントを削除
+- `subtractPoints(address user, uint256 amount)`: ユーザーからポイントを減算
 - `setExchangeRate(uint256 rate)`: 交換レートを設定
 - `depositUSDC(uint256 amount)`: コントラクトに USDC を入金
 - `withdrawUSDC(uint256 amount)`: コントラクトから USDC を出金

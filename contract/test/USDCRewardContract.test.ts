@@ -143,7 +143,7 @@ describe("USDCRewardContract", function () {
       });
     });
 
-    describe("removePoints", function () {
+    describe("subtractPoints", function () {
       it("should allow owner to remove points from user", async function () {
         const { usdcRewardContract, user1, publicClient } = await loadFixture(
           deployContractsFixture
@@ -160,7 +160,7 @@ describe("USDCRewardContract", function () {
         await publicClient.waitForTransactionReceipt({ hash });
 
         // Then remove points
-        hash = await usdcRewardContract.write.removePoints([
+        hash = await usdcRewardContract.write.subtractPoints([
           user1.account.address,
           removeAmount,
         ]);
@@ -189,7 +189,7 @@ describe("USDCRewardContract", function () {
         await publicClient.waitForTransactionReceipt({ hash });
 
         // Remove points
-        hash = await usdcRewardContract.write.removePoints([
+        hash = await usdcRewardContract.write.subtractPoints([
           user1.account.address,
           removeAmount,
         ]);
@@ -212,7 +212,7 @@ describe("USDCRewardContract", function () {
         );
 
         await expect(
-          usdcRewardContract.write.removePoints(
+          usdcRewardContract.write.subtractPoints(
             [user1.account.address, 100n],
             { account: nonOwner.account }
           )
@@ -225,7 +225,7 @@ describe("USDCRewardContract", function () {
         );
 
         await expect(
-          usdcRewardContract.write.removePoints([zeroAddress, 100n])
+          usdcRewardContract.write.subtractPoints([zeroAddress, 100n])
         ).to.be.rejectedWith("InvalidAddress");
       });
 
@@ -235,7 +235,7 @@ describe("USDCRewardContract", function () {
         );
 
         await expect(
-          usdcRewardContract.write.removePoints([user1.account.address, 0n])
+          usdcRewardContract.write.subtractPoints([user1.account.address, 0n])
         ).to.be.rejectedWith("InvalidAmount");
       });
 
@@ -256,7 +256,7 @@ describe("USDCRewardContract", function () {
 
         // Try to remove more than available
         await expect(
-          usdcRewardContract.write.removePoints([
+          usdcRewardContract.write.subtractPoints([
             user1.account.address,
             removeAmount,
           ])
@@ -269,7 +269,7 @@ describe("USDCRewardContract", function () {
         );
 
         await expect(
-          usdcRewardContract.write.removePoints([user1.account.address, 100n])
+          usdcRewardContract.write.subtractPoints([user1.account.address, 100n])
         ).to.be.rejectedWith("InsufficientPoints");
       });
     });
@@ -321,7 +321,7 @@ describe("USDCRewardContract", function () {
         await publicClient.waitForTransactionReceipt({ hash });
 
         // Remove points
-        hash = await usdcRewardContract.write.removePoints([
+        hash = await usdcRewardContract.write.subtractPoints([
           user1.account.address,
           removeAmount,
         ]);
@@ -1535,7 +1535,7 @@ describe("USDCRewardContract", function () {
         );
 
         await expect(
-          usdcRewardContract.write.removePoints([zeroAddress, 1000n])
+          usdcRewardContract.write.subtractPoints([zeroAddress, 1000n])
         ).to.be.rejectedWith("InvalidAddress");
       });
 
@@ -1561,7 +1561,7 @@ describe("USDCRewardContract", function () {
 
         // The claimUSDC function validates msg.sender internally, so we can't directly test with zero address
         // Instead, we test that the function properly validates addresses in general
-        // This test is covered by the other zero address tests for addPoints and removePoints
+        // This test is covered by the other zero address tests for addPoints and subtractPoints
         expect(true).to.be.true; // Placeholder - the validation is tested elsewhere
       });
     });
@@ -1583,7 +1583,7 @@ describe("USDCRewardContract", function () {
         );
 
         await expect(
-          usdcRewardContract.write.removePoints([user1.account.address, 0n])
+          usdcRewardContract.write.subtractPoints([user1.account.address, 0n])
         ).to.be.rejectedWith("InvalidAmount");
       });
 
@@ -1718,7 +1718,7 @@ describe("USDCRewardContract", function () {
 
         // Try to remove more than available
         await expect(
-          usdcRewardContract.write.removePoints([
+          usdcRewardContract.write.subtractPoints([
             user1.account.address,
             pointsToTransfer,
           ])
@@ -1758,7 +1758,7 @@ describe("USDCRewardContract", function () {
         ).to.be.rejectedWith("InvalidAddress");
 
         await expect(
-          usdcRewardContract.write.removePoints([zeroAddress, 1000n])
+          usdcRewardContract.write.subtractPoints([zeroAddress, 1000n])
         ).to.be.rejectedWith("InvalidAddress");
       });
 
@@ -1772,7 +1772,7 @@ describe("USDCRewardContract", function () {
         ).to.be.rejectedWith("InvalidAmount");
 
         await expect(
-          usdcRewardContract.write.removePoints([user1.account.address, 0n])
+          usdcRewardContract.write.subtractPoints([user1.account.address, 0n])
         ).to.be.rejectedWith("InvalidAmount");
 
         await expect(
@@ -1950,7 +1950,7 @@ describe("USDCRewardContract", function () {
         await publicClient.waitForTransactionReceipt({ hash });
 
         // Remove some points from user2
-        hash = await usdcRewardContract.write.removePoints([
+        hash = await usdcRewardContract.write.subtractPoints([
           user2.account.address,
           200n,
         ]);
@@ -2182,7 +2182,7 @@ describe("USDCRewardContract", function () {
         await publicClient.waitForTransactionReceipt({ hash });
 
         // Remove some points away
-        hash = await usdcRewardContract.write.removePoints([
+        hash = await usdcRewardContract.write.subtractPoints([
           user1.account.address,
           removeAmount,
         ]);
