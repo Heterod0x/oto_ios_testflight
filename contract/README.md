@@ -120,7 +120,7 @@ bun run coverage
 # ユーザーにポイントを追加
 bun run addPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 1000 --network base-sepolia
 
-# ユーザーからポイントを
+# ユーザーからポイントを減算
 bun run subtractPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 500 --network base-sepolia
 ```
 
