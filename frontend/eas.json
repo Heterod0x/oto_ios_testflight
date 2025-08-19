@@ -5,11 +5,17 @@
   },
   "build": {
     "local": {
-      "releaseChannel": "default"
+      "releaseChannel": "default",
+      "ios": {
+        "simulator": true
+      }
     },
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
     },
     "preview": {
       "distribution": "internal"
