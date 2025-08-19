@@ -25,12 +25,16 @@ export default function HomeScreen() {
     }
   };
 
+  const whiteBackground = '#ffffff'
+  
+
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: whiteBackground }}>
       <ScrollView 
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
+        style={{ backgroundColor: whiteBackground }}
       >
         <Box className="flex-1 mt-24 justify-center items-center px-5 py-8 pt-4 pb-12 bg-gradient-to-b from-background-0 to-background-50">
           {/* Header Section */}
@@ -48,8 +52,8 @@ export default function HomeScreen() {
               </Text>
               <Text size="sm" className={`text-error-600 font-medium ${isRecording ? '' : 'hidden'}`}>
                 Recording...
-              </Text>
-            </Box> */}
+            </Text>
+          </Box> */}
           </Box>
 
           {/* {!isReady && <Box className="justify-center items-center h-64">
