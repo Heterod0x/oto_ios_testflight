@@ -1,27 +1,29 @@
-import { Ionicons } from "@expo/vector-icons";
-import { PlatformPressable } from "@react-navigation/elements";
-import { Tabs } from "expo-router";
-import { Platform, TouchableOpacity } from "react-native";
-import { opacity } from "react-native-reanimated/lib/typescript/Colors";
+import { PlatformPressable } from '@react-navigation/elements';
+import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
+import ProfileIcon from '@/assets/images/profile.svg';
+import FileIcon from '@/assets/images/files.svg';
+import MicIcon from '@/assets/images/mic.svg';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#4f46e5",
-        tabBarInactiveTintColor: "#9ca3af",
+        tabBarActiveTintColor: '#000000',
+        tabBarInactiveTintColor: '#9ca3af',
         tabBarButton: (props) => (
-      <PlatformPressable
-        {...props}
-        pressColor="#4f46e533" //For android
-        pressOpacity={0.3} //For ios
-      />),
+          <PlatformPressable
+            {...props}
+            pressColor="#4f46e533" //For android
+            pressOpacity={0.3} //For ios
+          />
+        ),
         tabBarStyle: {
-          position: "absolute",
+          position: 'absolute',
           bottom: 25,
           left: 40,
           right: 40,
-          backgroundColor: "#ffffff",
+          backgroundColor: '#ffffff',
           borderRadius: 25,
           height: 70,
           paddingBottom: 10,
@@ -31,7 +33,7 @@ export default function TabLayout() {
           marginBottom: 8,
           borderTopWidth: 0,
           elevation: 10,
-          shadowColor: "#666",
+          shadowColor: '#666',
           shadowOffset: {
             width: 0,
             height: 5,
@@ -40,7 +42,7 @@ export default function TabLayout() {
           shadowRadius: 3,
           ...Platform.select({
             ios: {
-              shadowColor: "#666",
+              shadowColor: '#666',
               shadowOffset: { width: 0, height: 5 },
               shadowOpacity: 0.05,
               shadowRadius: 10,
@@ -52,7 +54,7 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: "600",
+          fontWeight: '600',
           marginTop: 2,
         },
         tabBarItemStyle: {
@@ -61,40 +63,32 @@ export default function TabLayout() {
         headerShown: false,
       }}
     >
-      <Tabs.Screen 
-        name="index" 
-        options={{ 
-          title: "Home", 
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} /> 
-        }} 
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: '',
+          tabBarIcon: ({ color, size }) => (
+            <FileIcon color={color} width={size} height={size} />
+          ),
+        }}
       />
-      <Tabs.Screen 
-        name="history" 
-        options={{ 
-          title: "History", 
-          tabBarIcon: ({ color, size }) => <Ionicons name="document-text" size={size} color={color} /> 
-        }} 
+      <Tabs.Screen
+        name="recording"
+        options={{
+          title: '',
+          tabBarIcon: ({ color, size }) => (
+            <MicIcon color={color} width={size} height={size} />
+          ),
+        }}
       />
-      <Tabs.Screen 
-        name="trends" 
-        options={{ 
-          title: "Trends", 
-          tabBarIcon: ({ color, size }) => <Ionicons name="trending-up" size={size} color={color} /> 
-        }} 
-      />
-      <Tabs.Screen 
-        name="vapps" 
-        options={{ 
-          title: "vApps", 
-          tabBarIcon: ({ color, size }) => <Ionicons name="apps" size={size} color={color} /> 
-        }} 
-      />
-      <Tabs.Screen 
-        name="profile" 
-        options={{ 
-          title: "Profile", 
-          tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} /> 
-        }} 
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: '',
+          tabBarIcon: ({ color, size }) => (
+            <ProfileIcon color={color} width={size} height={size} />
+          ),
+        }}
       />
     </Tabs>
   );
