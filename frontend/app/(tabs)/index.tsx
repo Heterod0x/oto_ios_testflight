@@ -1,70 +1,51 @@
-import { ActivityIndicator, SafeAreaView, ScrollView } from 'react-native';
-import RecordingControls from '@/components/recording/RecordingControls';
-import { Box } from '@/components/ui/box';
-import { Text, Heading } from '@/components/ui/text';
-import { Card, CardBody } from '@/components/ui/card';
+import { SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import usePointBalance from '@/hooks/usePointBalance';
-import { useState } from 'react';
-import LoginScreen from '@/components/LoginScreen';
-import { useLogin } from '@privy-io/expo/ui';
-import { Button, ButtonText } from "@/components/ui/button";
-import { useAuth } from '@/lib/oto-auth';
+
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
+import useConversations from '@/hooks/useConversations';
+import { convertAudioFileList, formatDateByCurrentTimezone } from '@/lib/audio';
+import AudioCard from '@/components/conversation/AudioCard';
 
 export default function HomeScreen() {
-  const { data: balance } = usePointBalance();
-  const [isRecording, setIsRecording] = useState(false);
-  const { user, isReady, loginWithSolana } = useAuth();
-  const { login } = useLogin();
+  // TODO: ログインしていない場合はログイン画面に遷移する
+  // TODO: today以外の日付を確認
+  const today = formatDateByCurrentTimezone(new Date().toISOString());
+  const { data: conversations, loading, error } = useConversations();
 
-  const handleConnectWallet = async () => {
-    try{
-      await loginWithSolana();
-    }catch(error){
-      console.error(error);
-    }
-  };
+  // TODO: Edge case: No audio files.
+  if (!conversations) return null;
+  const convertedConversations = convertAudioFileList(conversations);
 
-  const whiteBackground = '#ffffff'
-  
+  const whiteBackground = '#ffffff';
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: whiteBackground }}>
-      <ScrollView 
-        className="flex-1"
-        contentContainerStyle={{ flexGrow: 1 }}
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: whiteBackground }}
+    >
+      {/* Header */}
+      <Box className="flex-row items-center justify-center py-4 px-4 mb-4">
+        <TouchableOpacity className="flex-row items-center">
+          <Text size="xl" weight="semibold" className="text-gray-800">
+            Today
+          </Text>
+          <Box className="ml-2">
+            <Ionicons name="chevron-forward" size={14} color="#6b7280" />
+          </Box>
+        </TouchableOpacity>
+      </Box>
+
+      {/* Audio Recordings List */}
+      <ScrollView
+        className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
         style={{ backgroundColor: whiteBackground }}
       >
-        <Box className="flex-1 mt-24 justify-center items-center px-5 py-8 pt-4 pb-12 bg-gradient-to-b from-background-0 to-background-50">
-          {/* Header Section */}
-          <Box className="items-center">
-            <Heading size="lg" weight="bold" className="text-primary-900 mb-1 tracking-tight">
-             Start recording with OTO
-            </Heading>
-            <Text size="sm" className="text-typography-600 text-center mb-2 font-body">
-              Just allow access to your microphone.
-            </Text>
-            {/* <Box className="flex-row items-center mt-2">
-              <Box className="w-2 h-2 bg-success-500 rounded-full mr-2" />
-              <Text size="sm" className={`text-success-600 font-medium ${isRecording ? 'hidden' : ''}`}>
-                Ready to record
-              </Text>
-              <Text size="sm" className={`text-error-600 font-medium ${isRecording ? '' : 'hidden'}`}>
-                Recording...
-            </Text>
-          </Box> */}
-          </Box>
-
-          {/* {!isReady && <Box className="justify-center items-center h-64">
-            <ActivityIndicator size="large" color="#0000ff" />
-          </Box>} */}
-
-          {/* Recording Section */}
-          {user && isReady && <Box className="justify-center items-center">
-            <RecordingControls isRecording={isRecording} setRecording={setIsRecording} />
-          </Box>}
-
+        <Box>
+          {convertedConversations[today]?.map((conversation) => (
+            <AudioCard key={conversation.id} conversation={conversation} />
+          ))}
         </Box>
       </ScrollView>
     </SafeAreaView>

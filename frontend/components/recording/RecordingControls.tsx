@@ -1,233 +1,204 @@
-import useAudioRecorder from "@/hooks/useAudioRecorder";
-import { uploadAudio } from "@/services/api";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/lib/oto-auth";
-import * as FileSystem from "expo-file-system";
-import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
-import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Card, CardBody } from "@/components/ui/card";
+import useAudioRecorder from '@/hooks/useAudioRecorder';
+import { contributeConversation, uploadAudio } from '@/services/api';
+import { useAuth } from '@/lib/oto-auth';
+import React, { useCallback, useState } from 'react';
+import { Box } from '@/components/ui/box';
+import { ErrorModal } from '@/components/ui/ErrorModal';
+import InitialScreen from './InitialScreen';
+import RecordingInProgressScreen from './RecordingInProgressScreen';
+import RecordingCompleteScreen from './RecordingCompleteScreen';
+import ClaimScreen from './ClaimScreen';
+import { useFocusEffect } from 'expo-router';
 
 export interface RecordingControlsProps {
-  isRecording: boolean;
-  setRecording: (recording: boolean) => void;
+  conversationId?: string;
 }
 
-export default function RecordingControls({ isRecording, setRecording }: RecordingControlsProps) {
+enum PAGE {
+  INITIAL = 'initial',
+  RECORDING = 'recording',
+  COMPLETE = 'complete',
+  CLAIM = 'claim',
+}
+
+export default function RecordingControls({
+  conversationId: givenConversationId,
+}: RecordingControlsProps) {
   const {
     recording,
     startRecording,
     stopRecording,
-    playLastRecording,
-    stopCurrentPlayback,
     lastRecordingUri,
     duration,
-    permissionStatus,
-    isPlaying,
-    playbackPosition,
-    playbackDuration,
     setLastRecordingUri,
+    discardRecording,
   } = useAudioRecorder();
   const { user, getAccessToken } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
-  const [fileInfo, setFileInfo] = useState<{
-    size: number;
-    exists: boolean;
+  const [conversationId, setConversationId] = useState<string | null>(
+    givenConversationId || null
+  );
+  const [page, setPage] = useState<string>(
+    givenConversationId ? PAGE.COMPLETE : PAGE.INITIAL
+  );
+  const [errorStatus, setErrorStatus] = useState<{
+    message: string;
+    isRedirect: boolean;
   } | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (givenConversationId) {
+        setConversationId(givenConversationId);
+        setPage(PAGE.COMPLETE);
+      }
+      return () => {
+        setPage(PAGE.INITIAL);
+      };
+    }, [givenConversationId])
+  );
+
+  const moveToClaimPage = () => {
+    setPage(PAGE.CLAIM);
+  };
+
+  const contributeRecording = async (conversationId: string) => {
+    if (!user || !conversationId) return;
+    const token = (await getAccessToken()) || '';
+    try {
+      await contributeConversation(conversationId, user.id, token);
+      setPage(PAGE.CLAIM);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'Failed to contribute conversation';
+      setErrorStatus({
+        message: `Contribution failed: ${message}`,
+        isRedirect: false,
+      });
+      console.error('Error contributing conversation:', err);
+    }
+  };
 
   const uploadLastRecording = async () => {
     if (!lastRecordingUri || !user) return;
     setUploading(true);
-    setUploadStatus(null);
+
     try {
-      const token = (await getAccessToken()) || "";
-      await uploadAudio(lastRecordingUri, user.id, token, setUploadProgress);
-      setUploadStatus("Upload complete");
+      const token = (await getAccessToken()) || '';
+      const res = await uploadAudio(
+        lastRecordingUri,
+        user.id,
+        token,
+        setUploadProgress
+      );
+      setConversationId(res.id);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Upload failed";
-      setUploadStatus(message);
+      const message = err instanceof Error ? err.message : 'Upload failed';
+      setErrorStatus({
+        message: `Upload failed: ${message}`,
+        isRedirect: true,
+      });
     } finally {
       setUploading(false);
+      setPage(PAGE.COMPLETE);
     }
-  };
-
-  const checkFileInfo = async (uri: string) => {
-    try {
-      const info = await FileSystem.getInfoAsync(uri);
-      setFileInfo({
-        size: info.exists ? info.size || 0 : 0,
-        exists: info.exists,
-      });
-      return info;
-    } catch {
-      setFileInfo({ size: 0, exists: false });
-      return null;
-    }
-  };
-
-  const handlePlayLastRecording = async () => {
-    if (!lastRecordingUri) return;
-
-    if (isPlaying) {
-      await stopCurrentPlayback();
-      return;
-    }
-
-    const info = await checkFileInfo(lastRecordingUri);
-    if (!info?.exists || info.size === 0) return;
-
-    try {
-      await playLastRecording();
-    } catch (error) {
-      console.error("再生エラー:", error);
-    }
-  };
-
-  const formatDuration = (durationMs: number) => {
-    const seconds = Math.floor(durationMs / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
-      .toString()
-      .padStart(2, "0")}`;
   };
 
   const handleStartRecording = () => {
-    setRecording(true);
     startRecording();
+    setPage(PAGE.RECORDING);
   };
 
-  const handleStopRecording = () => {
-    setRecording(false);
-    stopRecording();
+  const handleStopRecording = async () => {
+    await stopRecording();
   };
 
-  const handleDiscardRecording = () => {
-    setRecording(false);
+  const handleDiscardRecording = async () => {
+    try {
+      await handleStopRecording();
+      await discardRecording();
+      setPage(PAGE.INITIAL);
+      setLastRecordingUri(null);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to discard recording';
+      setErrorStatus({
+        message: `Discard failed: ${message}`,
+        isRedirect: true,
+      });
+      console.error('Error discarding recording:', error);
+    }
+  };
+
+  const handleClaimComplete = async () => {
+    setUploading(false);
+    setUploadProgress(0);
     setLastRecordingUri(null);
+    setConversationId(null);
+    setPage(PAGE.INITIAL);
+  };
+
+  const handleRecordingScreen = (recording) => {
+    if (page === PAGE.INITIAL) {
+      return (
+        <InitialScreen
+          recording={recording}
+          handleStartRecording={handleStartRecording}
+        />
+      );
+    }
+    if (page === PAGE.RECORDING) {
+      return (
+        <RecordingInProgressScreen
+          handleStopRecording={handleStopRecording}
+          handleDiscardRecording={handleDiscardRecording}
+          uploading={uploading}
+          uploadProgress={uploadProgress}
+          uploadLastRecording={uploadLastRecording}
+          duration={duration}
+        />
+      );
+    }
+    if (page === PAGE.COMPLETE) {
+      return (
+        <RecordingCompleteScreen
+          handleDiscardRecording={handleDiscardRecording}
+          contributeRecording={contributeRecording}
+          moveToClaimPage={moveToClaimPage}
+          conversationId={conversationId}
+        />
+      );
+    }
+    if (page === PAGE.CLAIM) {
+      return (
+        <ClaimScreen
+          handleClaimComplete={handleClaimComplete}
+          setErrorStatus={setErrorStatus}
+        />
+      );
+    }
   };
 
   return (
-      <Box className="items-center justify-center w-full mx-4">
-        {/* Main Recording Button */}
-        <Box className="mb-0 mt-4">
-          <TouchableOpacity
-            className={`flex flex-row justify-center justify-center items-center bg-background-dark px-6 py-2 rounded-full shadow-lg ${
-              recording
-                ? "bg-error-600 scale-95"
-                : "bg-background-0 border-3 border-primary-600"
-            }`}
-            onPress={recording ? handleStopRecording : handleStartRecording}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name={recording ? "stop" : "mic"}
-              size={36}
-              color={recording ? "#ffffff" : "#ffffff"}
-            />
-            <Text size="lg" weight="bold" className="text-white font-inter tracking-wider">Allow</Text>
-          </TouchableOpacity>
-        </Box>
-
-      {/* Status Section */}
-      <Box className="h-10 mt-2 justify-center items-center w-full">
-        {recording ? (
-          <Box className="items-center">
-            <Text 
-              size="2xl" 
-              weight="light" 
-              className="text-typography-900 font-mono tracking-wider"
-            >
-              {formatDuration(duration)}
-            </Text>
-          </Box>
-        ) : (
-          <Box className="h-10" />
-        )}
-      </Box>
-
-      {/* Action Buttons Section */}
-      {lastRecordingUri && <Box className="h-10 justify-center items-center w-full mb-4">
-        {!recording && lastRecordingUri ? (
-          <Box className="flex-row justify-center gap-4 w-full max-w-xs">
-            <Button
-              variant="outline"
-              size="md"
-              className="flex-1"
-              onPress={handleDiscardRecording}
-            >
-              <Ionicons
-                name="trash"
-                size={20}
-                color="#9ca3af"
-                style={{ marginRight: 6 }}
-              />
-              <ButtonText variant="outline">
-                Discard
-              </ButtonText>
-            </Button>
-
-            <Button
-              size="md"
-              className="flex-1"
-              onPress={uploadLastRecording}
-              disabled={uploading}
-            >
-              <Ionicons
-                name={uploading ? "cloud-upload-outline" : "cloud-upload"}
-                size={20}
-                color={uploading ? "#9ca3af" : "#ffffff"}
-                style={{ marginRight: 6 }}
-              />
-              <ButtonText>
-                {uploading ? `${uploadProgress}%` : "Contribute"}
-              </ButtonText>
-            </Button>
-          </Box>
-        ) : (
-          <Box className="h-10" />
-        )}
-      </Box>}
-
-      {/* Playback Time Section */}
-      <Box className="h-8">
-        {!recording && (isPlaying || playbackDuration > 0) ? (
-          <Text 
-            size="lg" 
-            weight="medium" 
-            className="text-primary-600 font-mono tracking-wide"
-          >
-            {formatDuration(playbackPosition)} / {formatDuration(playbackDuration)}
-          </Text>
-        ) : (
-          <Box className="h-8" />
-        )}
-      </Box>
-
-      {/* Status Messages Section */}
-      {uploadStatus && <Box className="h-8 justify-center items-center w-full mb-4">
-        {uploadStatus && (
-          <Card variant="outline" size="sm" className="px-4 py-2">
-            <CardBody>
-              <Text 
-                size="sm" 
-                className={`text-center ${
-                  uploadStatus.includes("complete") 
-                    ? "text-success-700" 
-                    : "text-error-700"
-                }`}
-              >
-                {uploadStatus}
-              </Text>
-            </CardBody>
-          </Card>
-        )}
-      </Box>}
-
+    <Box className="h-full flex flex-col justify-end items-center w-full px-4">
+      <ErrorModal
+        isOpen={!!errorStatus?.message}
+        onClose={async () => {
+          if (errorStatus?.isRedirect) {
+            await handleDiscardRecording();
+          }
+          setErrorStatus(null);
+        }}
+        message={errorStatus?.message || ''}
+        title="Error"
+        buttonText="OK"
+      />
+      {/* Blank Header */}
+      <Box className="w-full h-20" />
+      {handleRecordingScreen(recording)}
     </Box>
   );
 }

@@ -7,4 +7,5 @@ export { Input } from './input';
 export { Header, HeaderAction } from './header';
 export { FAB, FABGroup } from './fab';
 export { Modal, ModalHeader, ModalBody, ModalFooter } from './modal';
+export { ErrorModal } from './ErrorModal';
 export { GluestackUIProvider } from './gluestack-ui-provider';

@@ -35,18 +35,16 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
       onRequestClose={onClose}
       backdropColor="transparent"
     >
-      <Pressable 
+      <Pressable
         className="flex-1 bg-black/0 justify-center items-center px-4"
         onPress={onClose}
       >
-        <Pressable 
+        <Pressable
           className="w-full max-w-sm"
           onPress={(e) => e.stopPropagation()}
         >
           <Card variant="elevated" className="mx-0">
-            <CardBody className="p-0">
-              {children}
-            </CardBody>
+            <CardBody className="p-0">{children}</CardBody>
           </Card>
         </Pressable>
       </Pressable>
@@ -57,19 +55,13 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 export function ModalHeader({ children, onClose }: ModalHeaderProps) {
   return (
     <Box className="flex-row items-center justify-between p-6 pb-4">
-      <Box className="flex-1">
-        {children}
-      </Box>
+      <Box className="flex-1">{children}</Box>
     </Box>
   );
 }
 
 export function ModalBody({ children }: ModalBodyProps) {
-  return (
-    <Box className="px-6 pb-4">
-      {children}
-    </Box>
-  );
+  return <Box className="px-6 pb-4">{children}</Box>;
 }
 
 export function ModalFooter({ children }: ModalFooterProps) {

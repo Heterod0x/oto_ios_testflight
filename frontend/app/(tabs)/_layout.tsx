@@ -2,7 +2,7 @@ import { PlatformPressable } from '@react-navigation/elements';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 import ProfileIcon from '@/assets/images/profile.svg';
-import FileIcon from '@/assets/images/files.svg';
+import FolderIcon from '@/assets/images/folder.svg';
 import MicIcon from '@/assets/images/mic.svg';
 
 export default function TabLayout() {
@@ -68,13 +68,14 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIcon: ({ color, size }) => (
-            <FileIcon color={color} width={size} height={size} />
+            <FolderIcon color={color} width={size} height={size} />
           ),
         }}
       />
       <Tabs.Screen
         name="recording"
         options={{
+          href: '/(tabs)/recording?mode=recording', // routing with stale conversationId sticks otherwise
           title: '',
           tabBarIcon: ({ color, size }) => (
             <MicIcon color={color} width={size} height={size} />
@@ -88,6 +89,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <ProfileIcon color={color} width={size} height={size} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="text"
+        options={{
+          href: null, // This hides it from the tab bar
+          // Alternative: tabBarButton: () => null,
         }}
       />
     </Tabs>
