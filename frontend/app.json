@@ -13,6 +13,15 @@
       "bundleIdentifier": "com.yourcompany.otoapp",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio for voice analysis and transcription."
+      },
+      "icon": {
+        "image": "./assets/images/icon.png",
+        "prerendered": true
+      },
+      "splash": {
+        "image": "./assets/images/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
       }
     },
     "web": {
@@ -22,7 +31,7 @@
     },
     "extra": {
       "privyAppId": "cmcc0wydx0086js0l5e5gj35e",
-      "privyClientId": "client-WY6N2jYhjSc3MBZXJinPQz9XWMUCQsJie5DXhXSBMz9WP",
+      "privyClientId": "client-WY6N2jYhjSc3MBZXJinPQz9XWMUCQsJie5MPqjhmHi2mr",
       "eas": {
         "projectId": "1da5ac4c-aa75-4cbc-876c-21334330f304"
       }
