@@ -2,17 +2,18 @@ import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
-} from "@expo-google-fonts/inter";
-import { GeistMono_400Regular } from "@expo-google-fonts/geist-mono";
-import { PrivyProvider } from "@privy-io/expo";
-import { PrivyElements } from "@privy-io/expo/ui";
-import Constants from "expo-constants";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import "@/global.css";
-import { AuthProvider } from "@/lib/oto-auth";
+} from '@expo-google-fonts/inter';
+import { GeistMono_400Regular } from '@expo-google-fonts/geist-mono';
+import { PrivyProvider, baseSepolia } from '@privy-io/expo';
+import { PrivyElements } from '@privy-io/expo/ui';
+import { SmartWalletsProvider } from '@privy-io/expo/smart-wallets';
+import Constants from 'expo-constants';
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import '@/global.css';
+import { AuthProvider } from '@/lib/oto-auth';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -28,16 +29,21 @@ export default function RootLayout() {
       <PrivyProvider
         appId={Constants.expoConfig?.extra?.privyAppId}
         clientId={Constants.expoConfig?.extra?.privyClientId}
+        // supportedChains={[baseSepolia]}
         config={{
-          embeddedWallets: {
-            solana: { createOnLogin: "all-users" },
+          embedded: {
+            ethereum: {
+              createOnLogin: 'users-without-wallets',
+            },
           },
-        } as any}
+        }}
       >
-        <AuthProvider>
+        <SmartWalletsProvider>
+          <AuthProvider>
             <Stack screenOptions={{ headerShown: false }} />
             <PrivyElements />
-        </AuthProvider>
+          </AuthProvider>
+        </SmartWalletsProvider>
       </PrivyProvider>
     </GluestackUIProvider>
   );
