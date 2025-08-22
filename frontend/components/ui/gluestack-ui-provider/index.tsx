@@ -22,10 +22,13 @@ export function GluestackUIProvider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
+  // Force light mode for consistent white background
+  const effectiveColorScheme = 'light';
+
   return (
     <View
       style={[
-        config[colorScheme!],
+        config[effectiveColorScheme],
         { flex: 1, height: '100%', width: '100%' },
         props.style,
       ]}

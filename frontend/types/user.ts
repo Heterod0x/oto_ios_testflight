@@ -10,8 +10,10 @@ export interface UserProfileResponse {
 }
 
 export interface PointBalanceResponse {
-  id: string;
+  user_id: string;
   points: number;
+  pending_points: number;
+  points_claimed: number;
 }
 
 export interface ClaimableAmountResponse {

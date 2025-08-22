@@ -1,12 +1,13 @@
-import notifee, { AndroidImportance } from "@notifee/react-native";
-import { Audio, InterruptionModeIOS } from "expo-av";
-import { useState } from "react";
+import notifee, { AndroidImportance } from '@notifee/react-native';
+import { Audio, InterruptionModeIOS } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
+import { useState } from 'react';
 
 export default function useAudioRecorder() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [lastRecordingUri, setLastRecordingUri] = useState<string | null>(null);
   const [duration, setDuration] = useState<number>(0);
-  const [permissionStatus, setPermissionStatus] = useState<string>("");
+  const [permissionStatus, setPermissionStatus] = useState<string>('');
   const [currentSound, setCurrentSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackPosition, setPlaybackPosition] = useState<number>(0);
@@ -19,7 +20,7 @@ export default function useAudioRecorder() {
       const { granted, status } = await Audio.requestPermissionsAsync();
       setPermissionStatus(`Permission: ${status}, Granted: ${granted}`);
       if (!granted) {
-        console.log("録音権限が拒否されました");
+        console.log('録音権限が拒否されました');
         return;
       }
 
@@ -34,7 +35,7 @@ export default function useAudioRecorder() {
       // Expo-AV で録音オブジェクト生成 - エミュレーター対応のより確実な設定
       const recordingOptions = {
         android: {
-          extension: ".m4a",
+          extension: '.m4a',
           outputFormat: Audio.AndroidOutputFormat.MPEG_4,
           audioEncoder: Audio.AndroidAudioEncoder.AAC,
           sampleRate: 44100,
@@ -42,7 +43,7 @@ export default function useAudioRecorder() {
           bitRate: 128000,
         },
         ios: {
-          extension: ".m4a",
+          extension: '.m4a',
           outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
           audioQuality: Audio.IOSAudioQuality.HIGH,
           sampleRate: 44100,
@@ -53,7 +54,7 @@ export default function useAudioRecorder() {
           linearPCMIsFloat: false,
         },
         web: {
-          mimeType: "audio/webm;codecs=opus",
+          mimeType: 'audio/webm;codecs=opus',
           bitsPerSecond: 128000,
         },
       };
@@ -67,29 +68,29 @@ export default function useAudioRecorder() {
 
       // 通知チャンネル作成（低重要度で十分）
       const channelId = await notifee.createChannel({
-        id: "recording",
-        name: "録音サービス",
+        id: 'recording',
+        name: '録音サービス',
         importance: AndroidImportance.LOW,
       });
 
       // フォアグラウンドサービス通知を表示し、サービスを起動
       await notifee.displayNotification({
-        title: "録音中",
-        body: "バックグラウンドでも録音を続けています",
+        title: '録音中',
+        body: 'バックグラウンドでも録音を続けています',
         android: {
           channelId,
           asForegroundService: true, // フォアグラウンドサービス通知を指定 :contentReference[oaicite:1]{index=1}
           ongoing: true, // ユーザー操作で消せないように
-          pressAction: { id: "default" }, // タップでアプリ起動
+          pressAction: { id: 'default' }, // タップでアプリ起動
         },
       });
 
       setRecording(recording);
-      console.log("録音開始成功");
+      console.log('録音開始成功');
     } catch (error) {
-      console.error("録音開始エラー:", error);
+      console.error('録音開始エラー:', error);
       setPermissionStatus(
-        `エラー: ${error instanceof Error ? error.message : "不明なエラー"}`
+        `エラー: ${error instanceof Error ? error.message : '不明なエラー'}`
       );
     }
   };
@@ -100,10 +101,12 @@ export default function useAudioRecorder() {
     await recording.stopAndUnloadAsync();
     setLastRecordingUri(recording.getURI()!);
     setRecording(null);
-    setDuration(0);
+    // setDuration(0);
 
     // フォアグラウンドサービス停止 → Promise が解決されて通知も消える :contentReference[oaicite:2]{index=2}
     await notifee.stopForegroundService();
+
+    return recording.getURI();
   };
 
   // 現在の再生を停止
@@ -113,7 +116,7 @@ export default function useAudioRecorder() {
         await currentSound.stopAsync();
         await currentSound.unloadAsync();
       } catch (error) {
-        console.log("既存の音声停止中にエラー:", error);
+        console.log('既存の音声停止中にエラー:', error);
       }
       setCurrentSound(null);
       setIsPlaying(false);
@@ -156,11 +159,26 @@ export default function useAudioRecorder() {
 
       await sound.playAsync();
     } catch (error) {
-      console.error("再生エラー:", error);
+      console.error('再生エラー:', error);
       setIsPlaying(false);
       setCurrentSound(null);
       setPlaybackPosition(0);
       throw error;
+    }
+  };
+
+  const discardRecording = async () => {
+    if (lastRecordingUri) {
+      try {
+        // Check if file exists before attempting to delete
+        const fileInfo = await FileSystem.getInfoAsync(lastRecordingUri);
+        if (fileInfo.exists) {
+          await FileSystem.deleteAsync(lastRecordingUri);
+          console.log('Recording file deleted from device');
+        }
+      } catch (error) {
+        console.error('Error deleting recording file:', error);
+      }
     }
   };
 
@@ -177,5 +195,6 @@ export default function useAudioRecorder() {
     playbackPosition,
     playbackDuration,
     setLastRecordingUri,
+    discardRecording,
   };
 }

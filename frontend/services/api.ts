@@ -1,17 +1,17 @@
-import { ConversationDTO } from "@/types/conversation";
+import { ConversationAudioUrlDTO, ConversationDTO } from '@/types/conversation';
 
-import { ClipListResponse } from "@/types/clip";
+import { ClipListResponse } from '@/types/clip';
 
-import { MicrotrendListResponse, TrendListResponse } from "@/types/trend";
+import { MicrotrendListResponse, TrendListResponse } from '@/types/trend';
 
-import { AnalysisResponse, TranscriptResponse } from "@/types/analysis";
+import { AnalysisResponse, TranscriptResponse } from '@/types/analysis';
 import {
   PointBalanceResponse,
   UserProfileResponse,
   UserUpdateRequest,
-} from "@/types/user";
+} from '@/types/user';
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || "https://otomvp-api-78nm.onrender.com";
+  process.env.EXPO_PUBLIC_API_URL || 'https://otomvp-api-78nm.onrender.com';
 
 export interface UploadResponse {
   id: string;
@@ -32,20 +32,21 @@ export async function uploadAudio(
   token: string,
   onProgress?: (progress: number) => void
 ): Promise<UploadResponse> {
-  throw new Error("Not implemented");
+  // throw new Error('Not implemented');
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
-    const fileName = uri.split("/").pop() || "recording.m4a";
-    formData.append("file", {
+    const fileName = uri.split('/').pop() || 'recording.m4a';
+    formData.append('file', {
       uri,
       name: fileName,
-      type: "audio/m4a",
+      type: 'audio/m4a',
     } as any);
 
     if (xhr.upload && onProgress) {
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
+          console.log('upload progress', e.loaded, e.total);
           const p = Math.round((e.loaded / e.total) * 100);
           onProgress(p);
         }
@@ -58,21 +59,42 @@ export async function uploadAudio(
           const data = JSON.parse(xhr.responseText);
           resolve(data);
         } catch (err) {
-          reject(new Error("Failed to parse response"));
+          reject(new Error('Failed to parse response'));
         }
       } else {
         reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText}`));
       }
     };
 
-    xhr.onerror = () => reject(new Error("Network error"));
-    xhr.onabort = () => reject(new Error("Upload aborted"));
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.onabort = () => reject(new Error('Upload aborted'));
 
-    xhr.open("POST", `${API_BASE_URL}/conversation/create`);
-    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    xhr.setRequestHeader("Oto-User-Id", userId);
+    xhr.open('POST', `${API_BASE_URL}/conversation/create`);
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.setRequestHeader('Oto-User-Id', userId);
     xhr.send(formData);
   });
+}
+
+export async function contributeConversation(
+  conversationId: string,
+  userId: string,
+  token: string
+): Promise<ConversationDTO> {
+  const res = await fetch(
+    `${API_BASE_URL}/conversation/${conversationId}/contribute`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Oto-User-Id': userId,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return (await res.json()) as ConversationDTO;
 }
 
 export async function fetchConversations(
@@ -82,7 +104,7 @@ export async function fetchConversations(
   const res = await fetch(`${API_BASE_URL}/conversation/list`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -99,13 +121,33 @@ export async function fetchConversation(
   const res = await fetch(`${API_BASE_URL}/conversation/${conversationId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);
   }
   return (await res.json()) as ConversationDTO;
+}
+
+export async function fetchConversationAudioUrl(
+  conversationId: string,
+  userId: string,
+  token: string
+): Promise<ConversationAudioUrlDTO> {
+  const res = await fetch(
+    `${API_BASE_URL}/conversation/${conversationId}/audio-url`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Oto-User-Id': userId,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return (await res.json()) as ConversationAudioUrlDTO;
 }
 
 export async function fetchClips(
@@ -117,7 +159,7 @@ export async function fetchClips(
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -134,7 +176,7 @@ export async function fetchClipAudioUrl(
   const res = await fetch(`${API_BASE_URL}/clip/${clipId}/audio`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -151,7 +193,7 @@ export async function fetchAnalysis(
   const res = await fetch(`${API_BASE_URL}/analysis/${conversationId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -168,7 +210,7 @@ export async function fetchTranscript(
   const res = await fetch(`${API_BASE_URL}/transcript/${conversationId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -200,7 +242,7 @@ export async function fetchUserProfile(
   const res = await fetch(`${API_BASE_URL}/user/get`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -215,11 +257,11 @@ export async function updateUserProfile(
   token: string
 ): Promise<UserProfileResponse> {
   const res = await fetch(`${API_BASE_URL}/user/update`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
     body: JSON.stringify(data),
   });
@@ -236,7 +278,7 @@ export async function fetchPointBalance(
   const res = await fetch(`${API_BASE_URL}/point/get`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -257,7 +299,7 @@ export async function fetchClaimableAmount(
   const res = await fetch(`${API_BASE_URL}/point/claimable_amount`, {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
   });
   if (!res.ok) {
@@ -277,11 +319,11 @@ export async function claimPoints(
   token: string
 ): Promise<ClaimResponse> {
   const res = await fetch(`${API_BASE_URL}/point/claim`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-      "Oto-User-Id": userId,
+      'Oto-User-Id': userId,
     },
     body: JSON.stringify({ tx_base64: txBase64 }),
   });
@@ -299,6 +341,7 @@ export async function claimPoints(
         parseError
       );
     }
+
     throw new Error(errorMessage);
   }
   return (await res.json()) as ClaimResponse;
@@ -312,9 +355,9 @@ export interface WalletAuthResponse {
 
 export async function startWalletAuth(): Promise<WalletAuthResponse> {
   const res = await fetch(`${API_BASE_URL}/auth/wallet/start`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
   });
   if (!res.ok) {
@@ -335,9 +378,9 @@ export async function verifyWalletAuth(
   signed_message: string
 ): Promise<ResponseVerifyWalletAuth> {
   const res = await fetch(`${API_BASE_URL}/auth/wallet/verify`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ user_id, challenge_id, signature, signed_message }),
   });
