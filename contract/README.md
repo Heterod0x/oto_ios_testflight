@@ -86,9 +86,19 @@ export CONTRACT_ADDRESS=<デプロイしたアドレス>
 
 さらに、 `deployed_addresses.json` に　 USDC のアドレスを設定する
 
+以下は base sepolia の場合
+
 ```json
 {
   "USDCModule#USDC": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+}
+```
+
+以下は base の場合
+
+```json
+{
+  "USDCModule#USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
 }
 ```
 
