@@ -5,10 +5,9 @@ export default function Index() {
   const { isLoggedIn, isReady } = useAuthStatus();
 
   // Show loading while checking auth status
-  if (!isReady) {
+  if (!isReady || isLoggedIn === null) {
     return null;
   }
-
   if (isLoggedIn) {
     return <Redirect href="/(tabs)" />;
   } else {

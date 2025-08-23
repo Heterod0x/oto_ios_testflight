@@ -4,6 +4,8 @@ import { Box } from '@/components/ui/box';
 import { useLogin } from '@privy-io/expo/ui';
 import { useAuth } from '@/lib/oto-auth';
 import { useLocalSearchParams } from 'expo-router';
+import { Button, ButtonText } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 export default function RecordingScreen() {
   const { user, isReady, loginWithSolana } = useAuth();
@@ -39,6 +41,13 @@ export default function RecordingScreen() {
         showsVerticalScrollIndicator={false}
         style={{ backgroundColor: whiteBackground }}
       >
+        {/* <Text className="text-typography-900 mb-4 text-md">Login with:</Text>
+        <Button
+          onPress={() => login({ loginMethods: ['email'] })}
+          className="w-32 bg-transparent border-primary-600 border-[1px]"
+        >
+          <ButtonText className="text-primary-600 text-md">Email</ButtonText>
+        </Button> */}
         {/* Recording Section */}
         {user && isReady && (
           <Box className="justify-center items-center">

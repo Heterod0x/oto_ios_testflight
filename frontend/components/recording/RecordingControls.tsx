@@ -74,8 +74,12 @@ export default function RecordingControls({
         err instanceof Error
           ? err.message
           : 'Failed to contribute conversation';
+
+      const customMessage = message.includes('Conversation is not accepted')
+        ? 'Conversation is not qualified for contribution. Please record a new conversation.'
+        : `Contribution failed: ${message}`;
       setErrorStatus({
-        message: `Contribution failed: ${message}`,
+        message: `${customMessage}`,
         isRedirect: false,
       });
       console.error('Error contributing conversation:', err);
@@ -138,7 +142,6 @@ export default function RecordingControls({
     setUploadProgress(0);
     setLastRecordingUri(null);
     setConversationId(null);
-    setPage(PAGE.INITIAL);
   };
 
   const handleRecordingScreen = (recording) => {

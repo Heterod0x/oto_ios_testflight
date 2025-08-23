@@ -14,18 +14,14 @@ import { StatusBar } from 'expo-status-bar';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
 import { AuthProvider } from '@/lib/oto-auth';
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { LoadingProvider, useLoading } from '@/contexts/LoadingContext';
 
-export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    GeistMono_400Regular,
-  });
-  if (!fontsLoaded) return null;
+function AppContent() {
+  const { isLoading, loadingMessage } = useLoading();
+
   return (
-    <GluestackUIProvider mode="light">
-      <StatusBar style="dark" backgroundColor="#ffffff" />
+    <>
       <PrivyProvider
         appId={Constants.expoConfig?.extra?.privyAppId}
         clientId={Constants.expoConfig?.extra?.privyClientId}
@@ -45,6 +41,33 @@ export default function RootLayout() {
           </AuthProvider>
         </SmartWalletsProvider>
       </PrivyProvider>
+
+      {/* Global Loading Overlay */}
+      <LoadingOverlay
+        visible={isLoading}
+        message={loadingMessage}
+        zIndex={9999}
+      />
+    </>
+  );
+}
+
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    GeistMono_400Regular,
+  });
+
+  if (!fontsLoaded) return null;
+
+  return (
+    <GluestackUIProvider mode="light">
+      <StatusBar style="dark" backgroundColor="#ffffff" />
+      <LoadingProvider>
+        <AppContent />
+      </LoadingProvider>
     </GluestackUIProvider>
   );
 }
