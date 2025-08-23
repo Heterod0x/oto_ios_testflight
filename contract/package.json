@@ -31,6 +31,7 @@
     "withdrawUSDC": "npx hardhat withdrawUSDC",
     "getBalances": "npx hardhat getBalances",
     "claimUSDC": "npx hardhat claimUSDC",
+    "getTotalClaimedPoints": "npx hardhat getTotalClaimedPoints",
     "pauseContract": "npx hardhat pauseContract",
     "unpauseContract": "npx hardhat unpauseContract",
     "transferOwnership": "npx hardhat transferOwnership"

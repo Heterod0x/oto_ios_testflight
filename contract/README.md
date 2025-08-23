@@ -133,7 +133,6 @@ bun run coverage
 ```bash
 # ユーザーにポイントを追加
 bun run addPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 1000 --network base-sepolia
-
 # ユーザーからポイントを減算
 bun run subtractPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 500 --network base-sepolia
 ```
@@ -184,6 +183,12 @@ bun run getBalances --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --network 
 ```bash
 # USDCを請求(デフォルトだと 1ポイント = 1USDC)
 bun run claimUSDC --points 1 --network base-sepolia
+```
+
+### Claim したポイントの総数を取得する
+
+```bash
+bun run getTotalClaimedPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --network base-sepolia
 ```
 
 ## 🔧 開発ツール
