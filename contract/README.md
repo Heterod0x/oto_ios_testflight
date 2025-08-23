@@ -41,6 +41,7 @@ bun install
 ```bash
 # 必須設定
 PRIVATE_KEY="your-private-key-here"
+MAINNET_PRIVATE_KEY="your-mainnet-key-here"
 ALCHEMY_API_KEY="your-alchemy-api-key"
 USDC_TOKEN_ADDRESS="0x036CbD53842c5426634e7929541eC2318f3dCF7e"  # Base Sepolia USDC
 
@@ -69,7 +70,10 @@ bun run compile
 
 ```bash
 # ネットワーク毎にUSDCのコントラクトを設定(ここの値はネットワーク毎に切り替える)
+# base sepoliaの場合は以下のアドレスを設定
 export USDC_TOKEN_ADDRESS=0x036CbD53842c5426634e7929541eC2318f3dCF7e
+# base の場合は以下のアドレスを設定
+export USDC_TOKEN_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
 # Base Sepoliaに自動デプロイ（初期設定付き）
 bun run deploy:full --network base-sepolia
 ```

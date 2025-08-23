@@ -5,7 +5,8 @@ import "./tasks";
 
 dotenv.config();
 
-const { PRIVATE_KEY, ALCHEMY_API_KEY, BASESCAN_API_KEY } = process.env;
+const { PRIVATE_KEY, MAINNET_PRIVATE_KEY, ALCHEMY_API_KEY, BASESCAN_API_KEY } =
+  process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -26,7 +27,7 @@ const config: HardhatUserConfig = {
     },
     base: {
       url: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+      accounts: MAINNET_PRIVATE_KEY !== undefined ? [MAINNET_PRIVATE_KEY] : [],
       chainId: 8453,
     },
     mainnet: {
