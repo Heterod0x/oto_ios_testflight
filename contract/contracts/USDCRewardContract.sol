@@ -17,6 +17,9 @@ contract USDCRewardContract is Ownable, Pausable, ReentrancyGuard {
   /// @dev Mapping of user addresses to their point balances
   mapping(address => uint256) private pointBalances;
 
+  /// @dev Mapping of user addresses to their total claimed points
+  mapping(address => uint256) private totalClaimedPoints;
+
   /// @dev Exchange rate from points to USDC (1 point = exchangeRate USDC wei)
   uint256 private exchangeRate;
 
@@ -147,6 +150,15 @@ contract USDCRewardContract is Ownable, Pausable, ReentrancyGuard {
     return pointBalances[user];
   }
 
+  /// @dev Gets the total claimed points of a user
+  /// @param user The user address to check
+  /// @return The total claimed points of the user
+  function getTotalClaimedPoints(
+    address user
+  ) external view returns (uint256) {
+    return totalClaimedPoints[user];
+  }
+
   // ==================== Exchange Rate Management Functions ====================
 
   /// @dev Sets the exchange rate from points to USDC (only owner)
@@ -203,6 +215,9 @@ contract USDCRewardContract is Ownable, Pausable, ReentrancyGuard {
 
     // Reduce user's point balance
     pointBalances[msg.sender] -= pointAmount;
+
+    // Add to total claimed points
+    totalClaimedPoints[msg.sender] += pointAmount;
 
     // Transfer USDC to user
     _transferUSDC(msg.sender, usdcAmount);

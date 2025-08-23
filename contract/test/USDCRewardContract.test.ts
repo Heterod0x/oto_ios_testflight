@@ -333,6 +333,39 @@ describe("USDCRewardContract", function () {
         expect(balance).to.equal(initialPoints - removeAmount);
       });
     });
+
+    describe("getTotalClaimedPoints", function () {
+      it("should return zero for a new user", async function () {
+        const { usdcRewardContract, user1 } = await loadFixture(
+          deployContractsFixture
+        );
+
+        const claimedPoints =
+          await usdcRewardContract.read.getTotalClaimedPoints([
+            user1.account.address,
+          ]);
+        expect(claimedPoints).to.equal(0n);
+      });
+
+      it("should return zero for a user who has points but hasn't claimed", async function () {
+        const { usdcRewardContract, user1, publicClient } = await loadFixture(
+          deployContractsFixture
+        );
+
+        // Add points but don't claim
+        const hash = await usdcRewardContract.write.addPoints([
+          user1.account.address,
+          1000n,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        const claimedPoints =
+          await usdcRewardContract.read.getTotalClaimedPoints([
+            user1.account.address,
+          ]);
+        expect(claimedPoints).to.equal(0n);
+      });
+    });
   });
 
   describe("Exchange Rate Management Functions", function () {
@@ -827,6 +860,101 @@ describe("USDCRewardContract", function () {
         expect(finalUserUSDC).to.equal(
           (firstClaim + secondClaim) * exchangeRate
         );
+      });
+
+      it("should update total claimed points after a successful claim", async function () {
+        const { usdcRewardContract, mockUSDC, user1, publicClient } =
+          await loadFixture(deployContractsFixture);
+
+        const pointsToAdd = 1000n;
+        const exchangeRate = 1000000n;
+        const pointsToSpend = 400n;
+
+        // Setup
+        let hash = await usdcRewardContract.write.setExchangeRate([
+          exchangeRate,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        hash = await usdcRewardContract.write.addPoints([
+          user1.account.address,
+          pointsToAdd,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        const usdcToDeposit = 1000000000n;
+        hash = await mockUSDC.write.approve([
+          usdcRewardContract.address,
+          usdcToDeposit,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        hash = await usdcRewardContract.write.depositUSDC([usdcToDeposit]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Claim USDC
+        hash = await usdcRewardContract.write.claimUSDC([pointsToSpend], {
+          account: user1.account,
+        });
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Check total claimed points
+        const totalClaimed =
+          await usdcRewardContract.read.getTotalClaimedPoints([
+            user1.account.address,
+          ]);
+        expect(totalClaimed).to.equal(pointsToSpend);
+      });
+
+      it("should accumulate total claimed points over multiple claims", async function () {
+        const { usdcRewardContract, mockUSDC, user1, publicClient } =
+          await loadFixture(deployContractsFixture);
+
+        const pointsToAdd = 1000n;
+        const exchangeRate = 1000000n;
+        const firstClaim = 300n;
+        const secondClaim = 200n;
+
+        // Setup
+        let hash = await usdcRewardContract.write.setExchangeRate([
+          exchangeRate,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        hash = await usdcRewardContract.write.addPoints([
+          user1.account.address,
+          pointsToAdd,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        const usdcToDeposit = 1000000000n;
+        hash = await mockUSDC.write.approve([
+          usdcRewardContract.address,
+          usdcToDeposit,
+        ]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        hash = await usdcRewardContract.write.depositUSDC([usdcToDeposit]);
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // First claim
+        hash = await usdcRewardContract.write.claimUSDC([firstClaim], {
+          account: user1.account,
+        });
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Second claim
+        hash = await usdcRewardContract.write.claimUSDC([secondClaim], {
+          account: user1.account,
+        });
+        await publicClient.waitForTransactionReceipt({ hash });
+
+        // Check total claimed points
+        const totalClaimed =
+          await usdcRewardContract.read.getTotalClaimedPoints([
+            user1.account.address,
+          ]);
+        expect(totalClaimed).to.equal(firstClaim + secondClaim);
       });
     });
   });

@@ -8,6 +8,7 @@ import "./usdcRewardContract/addPoints";
 import "./usdcRewardContract/claimUSDC";
 import "./usdcRewardContract/depositUSDC";
 import "./usdcRewardContract/getBalances";
+import "./usdcRewardContract/getTotalClaimedPoints";
 import "./usdcRewardContract/pauseContract";
 import "./usdcRewardContract/subtractPoints";
 import "./usdcRewardContract/setExchangeRate";
