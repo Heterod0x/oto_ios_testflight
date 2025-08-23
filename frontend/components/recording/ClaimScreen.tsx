@@ -4,8 +4,15 @@ import { Card, CardBody } from '@/components/ui/card';
 import usePointBalance from '@/hooks/usePointBalance';
 import { TouchableOpacity } from 'react-native';
 import ClaimIcon from '@/assets/images/claim.svg';
-import { claimPoints } from '@/services/api';
+import { syncPoints } from '@/services/api';
 import { useAuth } from '@/lib/oto-auth';
+import { useBaseContract } from '@/hooks/useBaseContract';
+import { useEffect, useState } from 'react';
+import FlashMessage, {
+  showMessage,
+  hideMessage,
+} from 'react-native-flash-message'; // TODO: Consider aggregating to @/components/ui/ErrorModal
+import { useLoading } from '@/contexts/LoadingContext';
 
 export default function ClaimScreen({
   handleClaimComplete,
@@ -14,19 +21,82 @@ export default function ClaimScreen({
   handleClaimComplete: () => void;
   setErrorStatus: (status: { message: string; isRedirect: boolean }) => void;
 }) {
+  const { showLoading, hideLoading } = useLoading();
+
+  const [isPointsSynced, setIsPointsSynced] = useState(false);
+  const [claimedPoints, setClaimedPoints] = useState<number>(0);
+  const [availablePoints, setAvailablePoints] = useState<number>(0);
+
+  const { user, getAccessToken } = useAuth();
+
+  const _syncPoints = async (id: string, token: string) => {
+    try {
+      const res = await syncPoints(id, token);
+      return !!res.success;
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      const message =
+        err instanceof Error ? err.message : 'Failed to sync points';
+      setErrorStatus({
+        message: `Sync points failed: ${message}`,
+        isRedirect: false,
+      });
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    showLoading();
+    hideMessage();
+
+    (async () => {
+      const token = (await getAccessToken()) || '';
+      const isSuccess = await _syncPoints(user?.id || '', token);
+      setIsPointsSynced(isSuccess);
+    })();
+
+    return () => hideLoading();
+  }, []);
+
   const {
     data: pointBalance,
     loading: pointBalanceLoading,
     error: pointBalanceError,
   } = usePointBalance();
-  const { user, getAccessToken } = useAuth();
 
-  const handleClaimPoints = async () => {
+  useEffect(() => {
+    if (pointBalance) {
+      setAvailablePoints(pointBalance?.points || 0);
+      setClaimedPoints(pointBalance?.points_claimed || 0);
+      hideLoading();
+    }
+  }, [isPointsSynced, pointBalance]);
+
+  const { claimUSDC } = useBaseContract();
+
+  const handleClaimPoints = async (points: number) => {
     if (!user) return;
+
     const token = (await getAccessToken()) || '';
     try {
-      const res = await claimPoints('tx..', user.id, token);
-      handleClaimComplete();
+      const txHash = await claimUSDC(points);
+      console.log('txHash...', txHash);
+      showLoading('Processing...');
+      if (txHash) {
+        const isSuccess = await _syncPoints(user?.id || '', token);
+        hideLoading();
+        if (!isSuccess) return;
+        setAvailablePoints(availablePoints - points);
+        setClaimedPoints(claimedPoints + points);
+        showMessage({
+          message: 'Point Claim Success',
+          description: 'Your points have been claimed successfully',
+          type: 'success',
+        });
+        handleClaimComplete();
+      } else {
+        throw new Error('Failed to claim points');
+      }
     } catch (err) {
       setErrorStatus({
         message: `Claiming points failed: ${
@@ -35,6 +105,8 @@ export default function ClaimScreen({
         isRedirect: false,
       });
       console.error('Error claiming points:', err);
+    } finally {
+      hideLoading();
     }
   };
 
@@ -44,6 +116,8 @@ export default function ClaimScreen({
 
   return (
     <>
+      <FlashMessage position="center" duration={3000} />
+
       {/* Main Earnings Card */}
       <Card
         variant="outline"
@@ -62,7 +136,7 @@ export default function ClaimScreen({
           {/* Points Display */}
           <Box className="flex flex-col items-center">
             <Text size="6xl" weight="bold" className="font-inter">
-              {pointBalance.points}
+              {availablePoints}
             </Text>
             <Text size="lg" weight="semibold" className="font-inter">
               pts
@@ -80,7 +154,7 @@ export default function ClaimScreen({
           </Text>
         </Box>
         <Text size="md" weight="medium" className="font-inter">
-          {pointBalance.points} pts
+          {availablePoints} pts
         </Text>
       </Box>
 
@@ -93,7 +167,7 @@ export default function ClaimScreen({
           </Text>
         </Box>
         <Text size="md" weight="medium" className="font-inter">
-          {pointBalance.points_claimed} pts
+          {claimedPoints} pts
         </Text>
       </Box>
 
@@ -101,7 +175,10 @@ export default function ClaimScreen({
       <Box className="w-full flex flex-row gap-2 pb-24">
         <TouchableOpacity
           className={`flex flex-row justify-center items-center bg-black px-4 py-3 flex-1 rounded-full`}
-          onPress={handleClaimPoints}
+          onPress={() => {
+            // TODO: hardcoding for test purpose
+            handleClaimPoints(availablePoints);
+          }}
           activeOpacity={0.8}
         >
           <ClaimIcon height={20} width={20} />

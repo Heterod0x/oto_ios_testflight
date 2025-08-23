@@ -37,3 +37,7 @@ export type ConversationAudioUrlDTO = {
 export type ConversationAudioFileListDTO = {
   [key: string]: { id: string; title: string; localTimezoneDate: string }[];
 };
+
+export interface SyncPointsResponse {
+  success: boolean;
+}
