@@ -7,6 +7,8 @@ import PlayIcon from '@/assets/images/play.svg';
 import SaveIcon from '@/assets/images/save.svg';
 import TrashIcon from '@/assets/images/trash.svg';
 import { useState } from 'react';
+import { Audio } from 'expo-av';
+import RecordingWaveform from '@/lib/recording-waveform';
 
 export default function RecordingInProgressScreen({
   handleStopRecording,
@@ -15,6 +17,7 @@ export default function RecordingInProgressScreen({
   uploadProgress,
   uploadLastRecording,
   duration,
+  recording,
 }: {
   handleStopRecording: () => Promise<void>;
   handleDiscardRecording: () => void;
@@ -22,12 +25,13 @@ export default function RecordingInProgressScreen({
   uploadProgress: number;
   uploadLastRecording: () => Promise<void>;
   duration: number;
+  recording: Audio.Recording;
 }) {
   const [isPlaying, setIsPlaying] = useState(true);
 
   return (
     <>
-      <Box className="flex flex-col gap-3 justify-center items-center">
+      <Box className="flex flex-col gap-3 justify-center items-center w-full">
         <Text size="xl" weight="bold" className="font-inter">
           New Recording
         </Text>
@@ -42,25 +46,33 @@ export default function RecordingInProgressScreen({
       {/* Main content area - takes up available space */}
       <Box className="flex-1 flex justify-center items-center w-full">
         {/* Add your wave content here if needed */}
+        <Box className="w-full h-80">
+          <RecordingWaveform recording={recording} />
+        </Box>
       </Box>
 
       {/* Bottom buttons section */}
       <Box className="w-full flex flex-col items-center">
         <TouchableOpacity
-          className={`flex justify-center items-center border-2 border-outline-700 w-32 px-4 py-5 rounded-full mb-6`}
+          className={`flex justify-center items-center border-2 w-32 px-4 py-5 rounded-full mb-6 ${
+            isPlaying ? 'border-outline-700' : 'border-gray-300 bg-gray-100'
+          }`}
           onPress={() => {
-            setIsPlaying((prev) => !prev);
-            handleStopRecording(); // TODO: 再録音できるようにするか仕様確認
+            if (isPlaying) {
+              setIsPlaying((prev) => !prev);
+              handleStopRecording(); // TODO: 再録音できるようにするか仕様確認
+            }
           }}
-          activeOpacity={0.8}
+          activeOpacity={isPlaying ? 0.8 : 1}
+          disabled={!isPlaying}
         >
           {isPlaying ? (
             <PauseIcon height={28} color="#000000" />
           ) : (
-            <PlayIcon height={28} color="#000000" />
+            <PlayIcon height={28} color="#9ca3af" />
           )}
         </TouchableOpacity>
-        <Box className="flex flex-row gap-2 w-full px-4 pb-24">
+        <Box className="flex flex-row gap-2 w-full px-2 pb-24">
           <TouchableOpacity
             className={`flex flex-row justify-center items-center bg-error-100 px-4 py-4 flex-1 rounded-full`}
             onPress={handleDiscardRecording}

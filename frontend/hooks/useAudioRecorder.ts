@@ -1,7 +1,7 @@
 import notifee, { AndroidImportance } from '@notifee/react-native';
 import { Audio, InterruptionModeIOS } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export default function useAudioRecorder() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
@@ -12,6 +12,8 @@ export default function useAudioRecorder() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackPosition, setPlaybackPosition] = useState<number>(0);
   const [playbackDuration, setPlaybackDuration] = useState<number>(0);
+
+  const recordingRef = useRef<Audio.Recording | null>(null);
 
   // 録音開始
   const startRecording = async () => {
@@ -59,7 +61,16 @@ export default function useAudioRecorder() {
         },
       };
 
-      const { recording } = await Audio.Recording.createAsync(recordingOptions);
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync({
+        ...recordingOptions,
+        isMeteringEnabled: true, // <— enable live metering
+      });
+      await recording.startAsync();
+
+      recordingRef.current = recording;
+
+      // const { recording } = await Audio.Recording.createAsync(recordingOptions);
       recording.setOnRecordingStatusUpdate((status) => {
         if (status.isRecording) {
           setDuration(status.durationMillis);

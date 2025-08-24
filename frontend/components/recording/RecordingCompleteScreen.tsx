@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { useLoading } from '@/contexts/LoadingContext';
 import { Toggle } from '@/components/ui/toggle';
 import UploadIcon from '@/assets/images/upload.svg';
+import PlayWaveform from '@/lib/play-waveform';
 
 export default function RecordingCompleteScreen({
   handleDiscardRecording,
@@ -56,6 +57,7 @@ export default function RecordingCompleteScreen({
     playPause,
     forward,
     backward,
+    audioLevels,
   } = useGlobalAudioPlayer();
 
   // Hide loading when audio finishes loading
@@ -102,13 +104,7 @@ export default function RecordingCompleteScreen({
             </Text>
           </Box>
           <Box className="flex flex-row justify-center items-center h-1/2 w-full">
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-typography-600  text-center font-body"
-            >
-              Waveform here...
-            </Text>
+            <PlayWaveform levels={audioLevels} isPlaying={isPlaying} />
           </Box>
 
           {/* Playback Controls - at bottom of card */}
