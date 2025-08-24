@@ -162,6 +162,7 @@ export default function RecordingControls({
           uploadProgress={uploadProgress}
           uploadLastRecording={uploadLastRecording}
           duration={duration}
+          recording={recording}
         />
       );
     }
