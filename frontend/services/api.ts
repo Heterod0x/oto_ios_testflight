@@ -1,4 +1,8 @@
-import { ConversationAudioUrlDTO, ConversationDTO } from '@/types/conversation';
+import {
+  ConversationAudioUrlDTO,
+  ConversationDTO,
+  SyncPointsResponse,
+} from '@/types/conversation';
 
 import { ClipListResponse } from '@/types/clip';
 
@@ -92,9 +96,13 @@ export async function contributeConversation(
     }
   );
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
+    const errorData = await res.json();
+    throw new Error(
+      `HTTP ${res.status}: ${errorData.detail || 'Unknown error'}`
+    );
   }
-  return (await res.json()) as ConversationDTO;
+  const data = await res.json();
+  return data as ConversationDTO;
 }
 
 export async function fetchConversations(
@@ -286,7 +294,6 @@ export async function fetchPointBalance(
   }
   return (await res.json()) as PointBalanceResponse;
 }
-
 export interface ClaimableAmountResponse {
   amount: number;
   display_amount: string;
@@ -345,6 +352,27 @@ export async function claimPoints(
     throw new Error(errorMessage);
   }
   return (await res.json()) as ClaimResponse;
+}
+
+export async function syncPoints(
+  userId: string,
+  token: string
+): Promise<SyncPointsResponse> {
+  const res = await fetch(`${API_BASE_URL}/point/sync`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Oto-User-Id': userId,
+    },
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.log('errorData', errorData);
+    throw new Error(
+      `HTTP ${res.status}: ${errorData.detail || 'Unknown error'}`
+    );
+  }
+  return (await res.json()) as SyncPointsResponse;
 }
 
 export interface WalletAuthResponse {

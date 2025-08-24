@@ -11,7 +11,10 @@ import BackwardIcon from '@/assets/images/backward.svg';
 import useAudioSignedUrl from '@/hooks/useAudioSignedUrl';
 import useGlobalAudioPlayer from '@/hooks/useGlobalAudioPlayer';
 import WriteIcon from '@/assets/images/write.svg';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useLoading } from '@/contexts/LoadingContext';
+import { Toggle } from '@/components/ui/toggle';
+import UploadIcon from '@/assets/images/upload.svg';
 
 export default function RecordingCompleteScreen({
   handleDiscardRecording,
@@ -24,6 +27,14 @@ export default function RecordingCompleteScreen({
   moveToClaimPage: () => void;
   conversationId: string;
 }) {
+  const { showLoading, hideLoading } = useLoading();
+  const [isProvidingRecordings, setIsProvidingRecordings] = useState(false);
+
+  useEffect(() => {
+    showLoading();
+    return () => hideLoading();
+  }, []);
+
   const {
     data: conversation,
     loading,
@@ -47,6 +58,13 @@ export default function RecordingCompleteScreen({
     backward,
   } = useGlobalAudioPlayer();
 
+  // Hide loading when audio finishes loading
+  useEffect(() => {
+    if (!audioLoading && playbackDuration) {
+      hideLoading();
+    }
+  }, [audioLoading, hideLoading, playbackDuration]);
+
   // Load audio when audioData is available
   useEffect(() => {
     if (audioData?.signed_url) {
@@ -55,15 +73,9 @@ export default function RecordingCompleteScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioData?.signed_url]);
 
-  if (loading || audioDataLoading || audioLoading)
-    return <Text>Loading...</Text>;
   if (error || audioDataError) return <Text>Error: {error}</Text>;
   if (!conversation) return <Text>No conversation found</Text>;
   if (!audioData) return <Text>No audio data found</Text>;
-  // TODO: Error handling on UI
-  if (conversation.verification_status !== 'accepted') {
-    // handleDiscardRecording();
-  }
 
   return (
     <>
@@ -146,19 +158,31 @@ export default function RecordingCompleteScreen({
       <Box className="w-full flex flex-col items-center">
         <Card variant="outline" size="sm" className="px-4 w-full mb-4">
           <CardBody>
-            <Box className="flex flex-row gap-2">
-              <Text size="sm" weight="semibold" className="font-inter">
-                Provided recordings
-              </Text>
-            </Box>
-            <Box className="flex flex-row gap-2">
-              <Text
-                size="sm"
-                weight="medium"
-                className="text-typography-600 text-center font-body"
-              >
-                Earn {conversation.estimated_points} points
-              </Text>
+            <Box className="flex flex-row items-center justify-between w-full">
+              <Box className="flex flex-row items-center gap-3">
+                <UploadIcon height={19} width={19} color="#6b7280" />
+                <Box>
+                  <Text
+                    size="sm"
+                    weight="semibold"
+                    className="font-inter text-gray-900"
+                  >
+                    Provide recordings
+                  </Text>
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-500 font-body"
+                  >
+                    Earn {conversation.estimated_points} points
+                  </Text>
+                </Box>
+              </Box>
+              <Toggle
+                value={isProvidingRecordings}
+                onValueChange={setIsProvidingRecordings}
+                size="lg"
+              />
             </Box>
           </CardBody>
         </Card>
@@ -173,18 +197,33 @@ export default function RecordingCompleteScreen({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`flex flex-row justify-center items-center bg-background-dark px-4 py-3 flex-1 rounded-full gap-2`}
+            className={`flex flex-row justify-center items-center px-4 py-3 flex-1 rounded-full gap-2 ${
+              isProvidingRecordings ? 'bg-background-dark' : 'bg-gray-300'
+            }`}
             onPress={() => {
+              if (!isProvidingRecordings) return; // Don't do anything if toggle is off
+
               if (conversation.contribution_status === 'contributed') {
                 moveToClaimPage();
               } else {
                 contributeRecording(conversationId);
               }
             }}
-            activeOpacity={0.8}
+            activeOpacity={isProvidingRecordings ? 0.8 : 1}
+            disabled={!isProvidingRecordings}
           >
-            <WriteIcon height={19} width={19} color="#ffffff" />
-            <Text size="lg" weight="semibold" className="text-white font-inter">
+            <WriteIcon
+              height={19}
+              width={19}
+              color={isProvidingRecordings ? '#ffffff' : '#9ca3af'}
+            />
+            <Text
+              size="lg"
+              weight="semibold"
+              className={`font-inter ${
+                isProvidingRecordings ? 'text-white' : 'text-gray-400'
+              }`}
+            >
               Contribute
             </Text>
           </TouchableOpacity>

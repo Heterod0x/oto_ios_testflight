@@ -1,11 +1,26 @@
 import { PlatformPressable } from '@react-navigation/elements';
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Platform } from 'react-native';
+import { useEffect } from 'react';
 import ProfileIcon from '@/assets/images/profile.svg';
 import FolderIcon from '@/assets/images/folder.svg';
 import MicIcon from '@/assets/images/mic.svg';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
 
 export default function TabLayout() {
+  const router = useRouter();
+  const { isLoggedIn, isReady } = useAuthStatus();
+
+  // useEffect(() => {
+  //   if (isReady && !isLoggedIn) {
+  //     router.replace('/login');
+  //   }
+  // }, [isLoggedIn, isReady, router]);
+
+  // Don't render tabs if not ready or not logged in
+  if (!isReady || isLoggedIn === null) {
+    return null;
+  }
   return (
     <Tabs
       screenOptions={{
@@ -89,13 +104,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <ProfileIcon color={color} width={size} height={size} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="text"
-        options={{
-          href: null, // This hides it from the tab bar
-          // Alternative: tabBarButton: () => null,
         }}
       />
     </Tabs>

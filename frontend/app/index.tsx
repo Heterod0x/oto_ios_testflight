@@ -1,6 +1,16 @@
-import LoginScreen from "@/components/LoginScreen";
-import { Redirect } from "expo-router";
+import { Redirect } from 'expo-router';
+import { useAuthStatus } from '@/hooks/useAuthStatus';
 
 export default function Index() {
-  return <Redirect href="/(tabs)" />;
+  const { isLoggedIn, isReady } = useAuthStatus();
+
+  // Show loading while checking auth status
+  if (!isReady || isLoggedIn === null) {
+    return null;
+  }
+  if (isLoggedIn) {
+    return <Redirect href="/(tabs)" />;
+  } else {
+    return <Redirect href="/login" />;
+  }
 }
