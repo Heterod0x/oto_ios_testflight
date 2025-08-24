@@ -54,17 +54,22 @@ export default function RecordingInProgressScreen({
       {/* Bottom buttons section */}
       <Box className="w-full flex flex-col items-center">
         <TouchableOpacity
-          className={`flex justify-center items-center border-2 border-outline-700 w-32 px-4 py-5 rounded-full mb-6`}
+          className={`flex justify-center items-center border-2 w-32 px-4 py-5 rounded-full mb-6 ${
+            isPlaying ? 'border-outline-700' : 'border-gray-300 bg-gray-100'
+          }`}
           onPress={() => {
-            setIsPlaying((prev) => !prev);
-            handleStopRecording(); // TODO: 再録音できるようにするか仕様確認
+            if (isPlaying) {
+              setIsPlaying((prev) => !prev);
+              handleStopRecording(); // TODO: 再録音できるようにするか仕様確認
+            }
           }}
-          activeOpacity={0.8}
+          activeOpacity={isPlaying ? 0.8 : 1}
+          disabled={!isPlaying}
         >
           {isPlaying ? (
             <PauseIcon height={28} color="#000000" />
           ) : (
-            <PlayIcon height={28} color="#000000" />
+            <PlayIcon height={28} color="#9ca3af" />
           )}
         </TouchableOpacity>
         <Box className="flex flex-row gap-2 w-full px-2 pb-24">
