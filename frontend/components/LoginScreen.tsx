@@ -6,11 +6,18 @@ import { Button, ButtonText } from '@/components/ui/button';
 import { Text, Heading } from '@/components/ui/text';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/lib/oto-auth';
+import { navigateToTabs } from '@/lib/session';
 
 export default function LoginScreen() {
   const { login } = useLogin();
   const [error, setError] = useState('');
-  const { isReady } = useAuth();
+  const { isReady, user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigateToTabs('/(tabs)');
+    }
+  }, [user]);
 
   if (!isReady)
     return (
