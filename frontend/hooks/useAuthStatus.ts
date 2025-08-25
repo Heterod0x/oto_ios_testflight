@@ -7,15 +7,25 @@ export const useAuthStatus = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (isReady) {
-      // Check if user is authenticated through Privy
-      const privyLoggedIn = !!user;
+    const checkAuthStatus = async () => {
+      if (isReady) {
+        try {
+          // Check if user is authenticated through Privy
+          const privyLoggedIn = !!user;
 
-      // Check if user is authenticated through wallet
-      const walletLoggedIn = hasSession();
+          // Check if user is authenticated through wallet
+          const walletLoggedIn = await hasSession();
 
-      setIsLoggedIn(!!(privyLoggedIn || walletLoggedIn));
-    }
+          const loggedIn = !!(privyLoggedIn || walletLoggedIn);
+          setIsLoggedIn(loggedIn);
+        } catch (error) {
+          console.error('Error checking auth status:', error);
+          setIsLoggedIn(false);
+        }
+      }
+    };
+
+    checkAuthStatus();
   }, [user, isReady]);
 
   return { isLoggedIn, isReady };
