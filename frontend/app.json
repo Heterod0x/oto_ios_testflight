@@ -4,7 +4,7 @@
     "slug": "oto",
     "version": "0.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/oto-bg-white-logo.png",
     "scheme": "otoapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,7 +15,7 @@
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio for voice analysis and transcription."
       },
       "icon": {
-        "image": "./assets/images/icon.png",
+        "image": "./assets/images/oto-bg-white-logo.png",
         "prerendered": true
       },
       "splash": {
