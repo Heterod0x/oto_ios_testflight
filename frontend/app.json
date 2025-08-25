@@ -33,7 +33,7 @@
       "privyAppId": "cmcc0wydx0086js0l5e5gj35e",
       "privyClientId": "client-WY6N2jYhjSc3MBZXJinPQz9XWMUCQsJie5DXhXSBMz9WP",
       "eas": {
-        "projectId": "1da5ac4c-aa75-4cbc-876c-21334330f304"
+        "projectId": "4dd98174-a84b-40e7-9aff-02d7e312d2b9"
       }
     },
     "plugins": [
@@ -53,6 +53,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4dd98174-a84b-40e7-9aff-02d7e312d2b9"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   },
   "owner": "leq6c"
