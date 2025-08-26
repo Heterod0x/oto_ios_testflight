@@ -1,1 +1,6 @@
 .serena
+
+# Documentation files (local only)
+ERROR_SOLUTIONS_UNIFIED.md
+Lessons.md
+PROJECT_STRUCTURE.md
