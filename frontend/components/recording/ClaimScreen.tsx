@@ -190,6 +190,11 @@ export default function ClaimScreen({
           </Text>
         </TouchableOpacity>
       </Box>
+
+      {/* Version */}
+      <Text size="sm" weight="medium" className="font-inter text-center">
+        v0.0.1-build.1
+      </Text>
     </>
     // </Box>
   );
