@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.otoapp",
+      "bundleIdentifier": "earth.oto.app",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio for voice analysis and transcription."
       },
@@ -33,7 +33,7 @@
       "privyAppId": "cmcc0wydx0086js0l5e5gj35e",
       "privyClientId": "client-WY6N2jYhjSc3MBZXJinPQz9XWMUCQsJie5DXhXSBMz9WP",
       "eas": {
-        "projectId": "1da5ac4c-aa75-4cbc-876c-21334330f304"
+        "projectId": "4dd98174-a84b-40e7-9aff-02d7e312d2b9"
       }
     },
     "plugins": [

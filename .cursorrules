@@ -1,0 +1,57 @@
+# Cursor Rules for oto_ios_testflight
+
+## 基本ルール
+- 常に日本語で応答する
+- フロントエンド実装では主にTailwind、shadcn、Magic UI、Lucideアイコンを使用
+- 新しいUIライブラリの追加時は事前に承認を得る
+
+## UIライブラリの使用
+### shadcn
+```bash
+npx shadcn@latest xxx
+# または
+pnpm dlx shadcn@latest xxx
+```
+
+### Magic UI
+```bash
+pnpm dlx shadcn@latest add "https://magicui.design/r/xxx"
+```
+
+### Lucide
+```bash
+pnpm install lucide-react
+```
+
+## フォント使用
+- 英語: Hanken Grotesk Bold/ExtraBold
+- 日本語: Noto Sans JP
+
+## エラーハンドリング
+- エラー解決時は必ずERROR_SOLUTIONS_UNIFIED.mdに記録
+- 同じエラーが2回以上発生した場合はWeb検索またはERROR_SOLUTIONS.mdを確認
+
+## コード品質・デプロイ
+- 定期的にnpm run buildを実行してエラーチェック
+- GitHubコミットやVercelデプロイ前に必ずnpm run buildを実行
+
+## ドキュメント
+- サービス設計に関連する機能追加・更新・削除時はDesign Documentを更新
+- 3回のインタラクションごとにCursor Rulesを確認
+- 存在しないドキュメントは作成する
+
+## 追加ガイドライン
+- 非エンジニア向けにLessons.mdを更新（比喩と具体例を使用）
+- 曖昧なクエリの場合は明確化の質問をする
+- 暗黙のコンテキストを想定せず、不確実性がある場合は確認する
+- 会話の最後に🦄を追加
+- 毎回Cursor Rulesをチェックする
+- グラデーション色は使用しない
+- PROJECT_STRUCTURE.mdでプロジェクト構造を文書化
+- UIライブラリの命名規則: {UI library abbreviation}{Component name} → ShadTab, MagicDock
+
+## 必須ドキュメント
+- PROJECT_STRUCTURE.md
+- ERROR_SOLUTIONS_UNIFIED.md
+- Lessons.md
+- Design Document（サービス設計関連）
