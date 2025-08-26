@@ -14,10 +14,7 @@
       "infoPlist": {
         "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio for voice analysis and transcription."
       },
-      "icon": {
-        "image": "./assets/images/oto-bg-white-logo.png",
-        "prerendered": true
-      },
+      "icon": "./assets/images/oto-bg-white-logo.png",
       "splash": {
         "image": "./assets/images/splash-icon.png",
         "resizeMode": "contain",
