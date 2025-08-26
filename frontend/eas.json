@@ -30,7 +30,8 @@
       "distribution": "store",
       "ios": {
         "resourceClass": "m-medium"
-      }
+      },
+      "channel": "testflight"
     }
   },
   "submit": {
