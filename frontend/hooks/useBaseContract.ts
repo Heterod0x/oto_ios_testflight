@@ -1,7 +1,7 @@
-import { usePrivy } from '@privy-io/expo';
-import abi from '../contracts/base_abi.json';
-import { useSmartWallets } from '@privy-io/expo/smart-wallets';
-import { encodeFunctionData } from 'viem';
+import { usePrivy } from "@privy-io/expo";
+import abi from "../contracts/base_abi.json";
+import { useSmartWallets } from "@privy-io/expo/smart-wallets";
+import { encodeFunctionData } from "viem";
 
 export function useBaseContract() {
   const { user } = usePrivy();
@@ -11,7 +11,7 @@ export function useBaseContract() {
     if (
       user &&
       user.linked_accounts &&
-      user.linked_accounts.findIndex((f) => f.type === 'smart_wallet') >= 0
+      user.linked_accounts.findIndex((f) => f.type === "smart_wallet") >= 0
     ) {
       // smart wallet
       if (client) {
@@ -21,29 +21,29 @@ export function useBaseContract() {
           // }); // base-sepolia
           const fndata = encodeFunctionData({
             abi: abi.abi,
-            functionName: 'claimUSDC',
+            functionName: "claimUSDC",
             args: [amount],
           });
           const tx = await client.sendTransaction({
             account: client.account,
             calls: [
               {
-                to: '0xB8760af2a4F4Df2225894324C106d587951D00CC' as `0x${string}`,
+                to: "0xB445f1c6FD6BD19Fe196A5894D12F46b66e5Ad29" as `0x${string}`,
                 data: fndata,
               },
             ],
           });
           return tx;
         } catch (error) {
-          console.error('Error getting client or sending transaction:', error);
+          console.error("Error getting client or sending transaction:", error);
           throw error;
         }
       } else {
-        console.error('SmartWallets not available');
-        throw new Error('SmartWallets not available');
+        console.error("SmartWallets not available");
+        throw new Error("SmartWallets not available");
       }
     } else {
-      alert('Non-smart wallet not supported yet');
+      alert("Non-smart wallet not supported yet");
       return null;
     }
   };

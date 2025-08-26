@@ -179,8 +179,7 @@ export default function ClaimScreen({
         <TouchableOpacity
           className={`flex flex-row justify-center items-center bg-black px-4 py-3 flex-1 rounded-full`}
           onPress={() => {
-            // TODO: hardcoding for test purpose
-            handleClaimPoints(1);
+            handleClaimPoints(availablePoints);
           }}
           activeOpacity={0.8}
         >

@@ -4,7 +4,7 @@ import {
   Inter_600SemiBold,
 } from '@expo-google-fonts/inter';
 import { GeistMono_400Regular } from '@expo-google-fonts/geist-mono';
-import { PrivyProvider, baseSepolia } from '@privy-io/expo';
+import { PrivyProvider, base } from '@privy-io/expo';
 import { PrivyElements } from '@privy-io/expo/ui';
 import { SmartWalletsProvider } from '@privy-io/expo/smart-wallets';
 import Constants from 'expo-constants';
@@ -25,7 +25,7 @@ function AppContent() {
       <PrivyProvider
         appId={Constants.expoConfig?.extra?.privyAppId}
         clientId={Constants.expoConfig?.extra?.privyClientId}
-        // supportedChains={[baseSepolia]}
+        supportedChains={[base]}
         config={{
           embedded: {
             ethereum: {
