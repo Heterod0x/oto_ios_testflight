@@ -14,12 +14,10 @@ import { StatusBar } from 'expo-status-bar';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
 import { AuthProvider } from '@/lib/oto-auth';
-import { LoadingOverlay } from '@/components/ui/loading-overlay';
-import { LoadingProvider, useLoading } from '@/contexts/LoadingContext';
+import { Loading } from '@/components/ui/loading';
+import { LoadingProvider } from '@/contexts/LoadingContext';
 
 function AppContent() {
-  const { isLoading, loadingMessage } = useLoading();
-
   return (
     <>
       <PrivyProvider
@@ -42,12 +40,8 @@ function AppContent() {
         </SmartWalletsProvider>
       </PrivyProvider>
 
-      {/* Global Loading Overlay */}
-      <LoadingOverlay
-        visible={isLoading}
-        message={loadingMessage}
-        zIndex={9999}
-      />
+      {/* Global Loading with Action Button Support */}
+      <Loading />
     </>
   );
 }
