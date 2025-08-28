@@ -4,15 +4,16 @@ import { Card, CardBody } from '@/components/ui/card';
 import usePointBalance from '@/hooks/usePointBalance';
 import { TouchableOpacity } from 'react-native';
 import ClaimIcon from '@/assets/images/claim.svg';
-import { syncPoints } from '@/services/api';
 import { useAuth } from '@/lib/oto-auth';
 import { useBaseContract } from '@/hooks/useBaseContract';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import FlashMessage, {
   showMessage,
   hideMessage,
 } from 'react-native-flash-message'; // TODO: Consider aggregating to @/components/ui/ErrorModal
 import { useLoading } from '@/contexts/LoadingContext';
+import { useFocusEffect } from 'expo-router';
+import { syncPointsOnServerSide } from '@/lib/point';
 
 export default function ClaimScreen({
   handleClaimComplete,
@@ -29,56 +30,62 @@ export default function ClaimScreen({
 
   const { user, getAccessToken } = useAuth();
 
-  const _syncPoints = async (id: string, token: string) => {
-    try {
-      const res = await syncPoints(id, token);
-      return !!res.success;
-    } catch (err) {
-      const errorMsg = JSON.stringify(err);
-      // 時々エラーが起こるが正常に動作しているため一旦無視
-      if (errorMsg.includes('Failed to sync points')) return;
+  useFocusEffect(
+    useCallback(() => {
+      showLoading();
+      hideMessage();
 
-      const message =
-        err instanceof Error ? err.message : 'Failed to sync points';
-      setErrorStatus({
-        message: `Sync points failed: ${message}`,
-        isRedirect: false,
-      });
-      return false;
-    }
-  };
+      (async () => {
+        const token = (await getAccessToken()) || '';
+        try {
+          const isSuccess = await syncPointsOnServerSide(user?.id || '', token);
+          setIsPointsSynced(isSuccess);
+        } catch (err) {
+          setErrorStatus({
+            message: err.message,
+            isRedirect: false,
+          });
+        }
+      })();
 
-  useEffect(() => {
-    showLoading();
-    hideMessage();
-
-    (async () => {
-      const token = (await getAccessToken()) || '';
-      const isSuccess = await _syncPoints(user?.id || '', token);
-      setIsPointsSynced(isSuccess);
-    })();
-
-    return () => hideLoading();
-  }, []);
+      return () => {
+        hideLoading();
+        hideMessage();
+        setIsPointsSynced(false);
+      };
+    }, [])
+  );
 
   const {
     data: pointBalance,
     loading: pointBalanceLoading,
     error: pointBalanceError,
-  } = usePointBalance();
+  } = usePointBalance([isPointsSynced]);
 
   useEffect(() => {
-    if (pointBalance) {
-      setAvailablePoints(pointBalance?.points || 0);
-      setClaimedPoints(pointBalance?.points_claimed || 0);
+    if (pointBalanceError) {
+      setErrorStatus({
+        message: pointBalanceError,
+        isRedirect: true,
+      });
+    }
+    if (isPointsSynced && !pointBalanceLoading) {
       hideLoading();
     }
-  }, [isPointsSynced, pointBalance]);
+  }, [isPointsSynced, pointBalanceLoading, pointBalanceError]);
 
   const { claimUSDC } = useBaseContract();
 
   const handleClaimPoints = async (points: number) => {
     if (!user) return;
+
+    if (points <= 0) {
+      setErrorStatus({
+        message: 'Points to claim must be greater than 0',
+        isRedirect: false,
+      });
+      return;
+    }
 
     const token = (await getAccessToken()) || '';
     try {
@@ -86,7 +93,7 @@ export default function ClaimScreen({
       const txHash = await claimUSDC(points);
       console.log('txHash...', txHash);
       if (txHash) {
-        const isSuccess = await _syncPoints(user?.id || '', token);
+        const isSuccess = await syncPointsOnServerSide(user?.id || '', token);
         hideLoading();
         if (!isSuccess) return;
         setAvailablePoints(availablePoints - points);
@@ -112,10 +119,6 @@ export default function ClaimScreen({
       hideLoading();
     }
   };
-
-  if (pointBalanceLoading) return <Text>Loading...</Text>;
-  if (pointBalanceError) return <Text>Error: {pointBalanceError}</Text>;
-  if (!pointBalance) return <Text>No point balance found</Text>;
 
   return (
     <>
@@ -195,6 +198,5 @@ export default function ClaimScreen({
         v0.0.1-build.2
       </Text>
     </>
-    // </Box>
   );
 }
