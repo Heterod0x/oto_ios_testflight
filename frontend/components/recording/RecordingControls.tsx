@@ -173,6 +173,7 @@ export default function RecordingControls({
           contributeRecording={contributeRecording}
           moveToClaimPage={moveToClaimPage}
           conversationId={conversationId}
+          setErrorStatus={setErrorStatus}
         />
       );
     }
