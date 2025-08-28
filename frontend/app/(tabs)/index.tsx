@@ -8,9 +8,16 @@ import { convertAudioFileList, formatDateByCurrentTimezone } from '@/lib/audio';
 import AudioCard from '@/components/conversation/AudioCard';
 
 export default function HomeScreen() {
-  // TODO: ログインしていない場合はログイン画面に遷移する
-  // TODO: today以外の日付を確認
-  const today = formatDateByCurrentTimezone(new Date().toISOString());
+  const pastOneWeekDate = [];
+  // 一週間分を表示
+  for (let i = 0; i < 7; i++) {
+    pastOneWeekDate.push(
+      formatDateByCurrentTimezone(
+        new Date(new Date().setDate(new Date().getDate() - i)).toISOString()
+      )
+    );
+  }
+
   const { data: conversations, loading, error } = useConversations();
 
   // TODO: Edge case: No audio files.
@@ -28,11 +35,11 @@ export default function HomeScreen() {
       <Box className="flex-row items-center justify-center py-4 px-4 mb-4">
         <TouchableOpacity className="flex-row items-center">
           <Text size="xl" weight="semibold" className="text-gray-800">
-            Today
+            Recents
           </Text>
-          <Box className="ml-2">
+          {/* <Box className="ml-2">
             <Ionicons name="chevron-forward" size={14} color="#6b7280" />
-          </Box>
+          </Box> */}
         </TouchableOpacity>
       </Box>
 
@@ -43,9 +50,21 @@ export default function HomeScreen() {
         style={{ backgroundColor: whiteBackground }}
       >
         <Box>
-          {convertedConversations[today]?.map((conversation) => (
-            <AudioCard key={conversation.id} conversation={conversation} />
-          ))}
+          {pastOneWeekDate.map((date) =>
+            convertedConversations[date]?.map((conversation, i) => (
+              <Box key={`box-${conversation.id}-${date}`} className="mb-4">
+                {i === 0 && (
+                  <Text
+                    key={`text-${conversation.id}-${date}`}
+                    className="mb-2 text-center text-typography-600"
+                  >
+                    {date}
+                  </Text>
+                )}
+                <AudioCard key={conversation.id} conversation={conversation} />
+              </Box>
+            ))
+          )}
         </Box>
       </ScrollView>
     </SafeAreaView>
