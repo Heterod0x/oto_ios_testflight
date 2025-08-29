@@ -35,13 +35,13 @@ export default function LoginScreen() {
       <Box className="flex-1 justify-center items-center px-8 bg-gradient-to-br from-primary-50 to-secondary-50">
         {/* Logo/Brand Section */}
         <Box className="items-center mb-12">
-          <Box className="w-20 h-20 bg-primary-600 rounded-full items-center justify-center mb-6 shadow-lg">
+          <Box className="w-20 h-20 bg-primary-950 rounded-full items-center justify-center mb-6 shadow-lg">
             <Ionicons name="mic" size={32} color="white" />
           </Box>
-          <Heading size="4xl" className="text-primary-900 mb-2">
+          <Heading size="4xl" className="mb-2">
             OTO
           </Heading>
-          <Text size="lg" className="text-typography-600 text-center">
+          <Text size="lg" className="text-primary-950 text-center">
             Record, Analyze & Share Conversations
           </Text>
         </Box>
@@ -50,7 +50,7 @@ export default function LoginScreen() {
         <Box className="w-full max-w-sm">
           <Button
             size="lg"
-            className="w-full mb-4 shadow-md"
+            className="w-full mb-4"
             onPress={() =>
               login({ loginMethods: ['email'] }).catch((err) =>
                 setError(String(err?.message ?? err))

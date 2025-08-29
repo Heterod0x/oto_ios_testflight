@@ -20,10 +20,10 @@ export function Button({
   className,
 }: ButtonProps) {
   const baseStyles = 'rounded-lg items-center justify-center flex-row';
-  
+
   const variantStyles = {
-    solid: 'bg-primary-600 active:bg-primary-700',
-    outline: 'border border-primary-600 bg-transparent active:bg-primary-50',
+    solid: 'bg-primary-950 active:bg-secondary-950',
+    outline: 'border border-primary-950 bg-transparent active:bg-secondary-950',
     ghost: 'bg-transparent active:bg-primary-50',
   };
 
@@ -75,13 +75,7 @@ export function ButtonText({
   };
 
   return (
-    <Text
-      className={cn(
-        variantStyles[variant],
-        sizeStyles[size],
-        className
-      )}
-    >
+    <Text className={cn(variantStyles[variant], sizeStyles[size], className)}>
       {children}
     </Text>
   );
