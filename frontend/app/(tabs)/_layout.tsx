@@ -97,7 +97,7 @@ export default function TabLayout() {
               color={color}
               width={size}
               height={size}
-              style={{ marginTop: 6 }}
+              style={{ marginTop: 8 }}
             />
           ),
         }}
@@ -109,7 +109,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons
               name="attach-money"
-              style={{ marginTop: -4 }}
+              style={{ marginTop: -2 }}
               size={size + 5}
               color={color}
             />
@@ -117,17 +117,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="logout"
+        name="profile"
         options={{
-          href: '/(tabs)/logout',
           title: '',
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons
-              name="logout"
-              style={{ marginTop: 3 }}
-              size={size + 2}
-              color={color}
-            />
+            <ProfileIcon color={color} width={size} height={size} />
           ),
         }}
       />

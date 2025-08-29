@@ -17,20 +17,16 @@ export const hasSession = async (): Promise<boolean> => {
 export const navigateToTabs = (href: Href) => {
   const navigate = () => {
     try {
-      console.log('Attempting navigation to tabs');
-      router.replace(href);
+      router.push(href);
     } catch (error) {
-      console.error('Navigation error:', error);
-      // Fallback: try push instead of replace
+      // Fallback: try replace instead of push
       try {
-        router.push(href);
+        router.replace(href);
       } catch (pushError) {
         console.error('Push navigation also failed:', pushError);
       }
     }
   };
 
-  // Use platform-specific timing for iOS mobile device
-  const delay = Platform.OS === 'ios' ? 200 : 100;
-  setTimeout(navigate, delay);
+  navigate();
 };
