@@ -73,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    privyLogout();
     setWalletToken('');
     setUser(null);
     setAuthType('');
