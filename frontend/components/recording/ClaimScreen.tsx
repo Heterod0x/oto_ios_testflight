@@ -73,9 +73,11 @@ export default function ClaimScreen({
       });
     }
     if (isPointsSynced && !pointBalanceLoading) {
+      setAvailablePoints(pointBalance?.points || 0);
+      setClaimedPoints(pointBalance?.points_claimed || 0);
       hideLoading();
     }
-  }, [isPointsSynced, pointBalanceLoading, pointBalanceError]);
+  }, [isPointsSynced, pointBalanceLoading, pointBalanceError, pointBalance]);
 
   const { claimUSDC } = useBaseContract();
 
