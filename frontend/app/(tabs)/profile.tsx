@@ -1,4 +1,10 @@
-import { ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+} from 'react-native';
 import { useCallback } from 'react';
 import useUserProfile from '@/hooks/useUserProfile';
 import usePointBalance from '@/hooks/usePointBalance';
@@ -14,11 +20,19 @@ export default function ProfileScreen() {
   const { user } = useAuth();
   const { data: profile, loading: loadingProfile, save } = useUserProfile();
   const { data: balance } = usePointBalance();
-  const { data: claimable, claim, claiming, error: claimError } = usePointClaim();
+  const {
+    data: claimable,
+    claim,
+    claiming,
+    error: claimError,
+  } = usePointClaim();
 
-  const handleSave = useCallback(async (data: any) => {
-    await save(data);
-  }, [save]);
+  const handleSave = useCallback(
+    async (data: any) => {
+      await save(data);
+    },
+    [save]
+  );
 
   if (!user) return null;
 
@@ -27,7 +41,9 @@ export default function ProfileScreen() {
       <SafeAreaView className="flex-1">
         <Box className="flex-1 justify-center items-center bg-background-0">
           <ActivityIndicator size="large" color="#4f46e5" />
-          <Text size="lg" className="text-typography-600 mt-4">Loading profile...</Text>
+          <Text size="lg" className="text-typography-600 mt-4">
+            Loading profile...
+          </Text>
         </Box>
       </SafeAreaView>
     );
@@ -37,7 +53,9 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView className="flex-1">
         <Box className="flex-1 justify-center items-center bg-background-0">
-          <Text size="lg" className="text-error-600">Failed to load profile</Text>
+          <Text size="lg" className="text-error-600">
+            Failed to load profile
+          </Text>
         </Box>
       </SafeAreaView>
     );
@@ -50,30 +68,32 @@ export default function ProfileScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={80}
       >
-        <ScrollView 
-          className="flex-1 bg-background-0" 
+        <ScrollView
+          className="flex-1 bg-background-0"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
           <Box className="px-5 py-6 pt-24">
-            <Box className="mb-8">
-              <Heading size="2xl" className="text-typography-900 mb-2">Profile</Heading>
+            {/* <Box className="mb-8">
+              <Heading size="2xl" className="text-typography-900 mb-2">
+                Profile
+              </Heading>
               <Text size="md" className="text-typography-600">
                 Manage your account settings and preferences
               </Text>
-            </Box>
-            
-            <ProfileForm profile={profile} onSave={handleSave} loading={loadingProfile} />
+            </Box> */}
+
+            {/* <ProfileForm profile={profile} onSave={handleSave} loading={loadingProfile} />
             <EarningsPanel
               balance={balance}
               claimable={claimable}
               onClaim={claim}
               claiming={claiming}
               error={claimError}
-            />
+            /> */}
             <AccountActions />
           </Box>
-          <Box className="h-20"/>
+          <Box className="h-20" />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

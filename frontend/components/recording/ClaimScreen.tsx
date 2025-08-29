@@ -14,6 +14,7 @@ import FlashMessage, {
 import { useLoading } from '@/contexts/LoadingContext';
 import { useFocusEffect } from 'expo-router';
 import { syncPointsOnServerSide } from '@/lib/point';
+import { navigateToTabs } from '@/lib/session';
 
 export default function ClaimScreen({
   handleClaimComplete,
@@ -45,6 +46,8 @@ export default function ClaimScreen({
             message: err.message,
             isRedirect: false,
           });
+          hideLoading();
+          navigateToTabs('/(tabs)');
         }
       })();
 
@@ -70,9 +73,11 @@ export default function ClaimScreen({
       });
     }
     if (isPointsSynced && !pointBalanceLoading) {
+      setAvailablePoints(pointBalance?.points || 0);
+      setClaimedPoints(pointBalance?.points_claimed || 0);
       hideLoading();
     }
-  }, [isPointsSynced, pointBalanceLoading, pointBalanceError]);
+  }, [isPointsSynced, pointBalanceLoading, pointBalanceError, pointBalance]);
 
   const { claimUSDC } = useBaseContract();
 
@@ -128,7 +133,7 @@ export default function ClaimScreen({
       <Card
         variant="outline"
         size="sm"
-        className="w-full mb-6 p-6 bg-gray-100 rounded-2xl flex-1"
+        className="w-full mb-6 p-8 bg-gray-100 rounded-2xl flex-1"
       >
         <CardBody className="flex flex-col justify-center items-center gap-4 h-full">
           {/* Earnings Title */}
@@ -152,7 +157,7 @@ export default function ClaimScreen({
       </Card>
 
       {/* Available to Claim */}
-      <Box className="w-full flex flex-row justify-between items-center mb-3">
+      <Box className="w-full flex flex-row justify-between items-center">
         <Box className="flex flex-row items-center gap-3">
           <Box className="w-3 h-3 bg-green-200 rounded-full" />
           <Text size="md" weight="medium" className="font-body">
@@ -165,7 +170,7 @@ export default function ClaimScreen({
       </Box>
 
       {/* Total Claimed */}
-      <Box className="w-full flex flex-row justify-between items-center mb-8">
+      <Box className="w-full flex flex-row justify-between items-center mt-4">
         <Box className="flex flex-row items-center gap-3">
           <Box className="w-3 h-3 bg-blue-500 rounded-full" />
           <Text size="md" weight="medium" className="font-body">
@@ -178,9 +183,9 @@ export default function ClaimScreen({
       </Box>
 
       {/* Claim Points Button */}
-      <Box className="w-full flex flex-row gap-2 pb-24">
+      <Box className="w-full flex flex-row pb-14 mt-4">
         <TouchableOpacity
-          className={`flex flex-row justify-center items-center bg-black px-4 py-3 flex-1 rounded-full`}
+          className={`flex flex-row justify-center items-center bg-black px-4 py-4 flex-1 rounded-full`}
           onPress={() => {
             handleClaimPoints(availablePoints);
           }}
@@ -195,7 +200,7 @@ export default function ClaimScreen({
 
       {/* Version */}
       <Text size="sm" weight="medium" className="font-inter text-center">
-        v0.0.1-build.2
+        v0.0.1-build.3
       </Text>
     </>
   );
