@@ -11,36 +11,79 @@ import BackwardIcon from '@/assets/images/backward.svg';
 import useAudioSignedUrl from '@/hooks/useAudioSignedUrl';
 import useGlobalAudioPlayer from '@/hooks/useGlobalAudioPlayer';
 import WriteIcon from '@/assets/images/write.svg';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLoading } from '@/contexts/LoadingContext';
 import { Toggle } from '@/components/ui/toggle';
 import UploadIcon from '@/assets/images/upload.svg';
 import PlayWaveform from '@/lib/play-waveform';
+import { navigateToTabs } from '@/lib/session';
+import FlashMessage, { showMessage } from 'react-native-flash-message';
 
 export default function RecordingCompleteScreen({
   handleDiscardRecording,
   contributeRecording,
   moveToClaimPage,
   conversationId,
+  setErrorStatus,
 }: {
   handleDiscardRecording: () => void;
   contributeRecording: (conversationId: string) => void;
   moveToClaimPage: () => void;
   conversationId: string;
+  setErrorStatus: (status: { message: string; isRedirect: boolean }) => void;
 }) {
-  const { showLoading, hideLoading } = useLoading();
+  const { showLoading, hideLoading, setActionClickHandler } = useLoading();
   const [isProvidingRecordings, setIsProvidingRecordings] = useState(false);
-
-  useEffect(() => {
-    showLoading();
-    return () => hideLoading();
-  }, []);
+  const refetchCount = useRef(0);
 
   const {
     data: conversation,
     loading,
     error,
+    refetch,
   } = useConversation(conversationId);
+
+  useEffect(() => {
+    if (conversation && conversation.status !== 'completed') {
+      // Check status every 3 seconds for 60 seconds.
+      const interval = setInterval(() => {
+        refetch();
+        refetchCount.current++;
+      }, 3000);
+
+      if (refetchCount.current > 20) {
+        setErrorStatus({
+          message: 'Analysis timed out. Please try again.',
+          isRedirect: true,
+        });
+
+        clearInterval(interval);
+        return;
+      }
+      showLoading('Analysis in progress...', {
+        text: 'Back to Home',
+        variant: 'outline',
+      });
+
+      // キャンセルボタンのハンドラーを設定
+      setActionClickHandler(() => {
+        hideLoading();
+        navigateToTabs('/');
+      });
+
+      return () => {
+        clearInterval(interval);
+        hideLoading();
+      };
+    } else if (refetchCount.current > 0) {
+      showMessage({
+        message: 'Analysis completed',
+        description: 'You can now contribute your recording',
+        type: 'success',
+      });
+      hideLoading();
+    }
+  }, [conversation, refetch]);
 
   const {
     data: audioData,
@@ -62,10 +105,15 @@ export default function RecordingCompleteScreen({
 
   // Hide loading when audio finishes loading
   useEffect(() => {
-    if (!audioLoading && playbackDuration) {
+    if (
+      !audioLoading &&
+      playbackDuration &&
+      conversation.status === 'completed'
+    ) {
+      console.log('hideLoading4');
       hideLoading();
     }
-  }, [audioLoading, hideLoading, playbackDuration]);
+  }, [audioLoading, playbackDuration, conversation]);
 
   // Load audio when audioData is available
   useEffect(() => {
@@ -81,6 +129,7 @@ export default function RecordingCompleteScreen({
 
   return (
     <>
+      <FlashMessage position="center" duration={3000} />
       <Card
         variant="outline"
         size="sm"

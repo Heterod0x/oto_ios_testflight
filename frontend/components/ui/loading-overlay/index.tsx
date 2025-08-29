@@ -2,12 +2,26 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Spinner } from '../spinner';
 import { Text } from '../text';
+import { Button, ButtonText } from '../button';
+
+interface ActionButton {
+  text: string;
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link';
+}
 
 interface LoadingOverlayProps {
   visible: boolean;
   message?: string;
   spinnerColor?: string;
   zIndex?: number;
+  actionButton?: ActionButton;
+  onActionClick?: () => void;
 }
 
 const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
@@ -15,8 +29,26 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   message = 'Loading...',
   spinnerColor = '#3b82f6',
   zIndex = 9999,
+  actionButton,
+  onActionClick,
 }) => {
   if (!visible) return null;
+
+  // variantのマッピング
+  const mapVariant = (variant?: string) => {
+    switch (variant) {
+      case 'default':
+        return 'solid';
+      case 'destructive':
+        return 'solid';
+      case 'secondary':
+        return 'outline';
+      case 'link':
+        return 'ghost';
+      default:
+        return (variant as 'solid' | 'outline' | 'ghost') || 'outline';
+    }
+  };
 
   return (
     <View style={[styles.overlay, { zIndex }]}>
@@ -26,6 +58,20 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           <Text style={styles.message} size="md">
             {message}
           </Text>
+        )}
+        {actionButton && onActionClick && (
+          <View style={styles.buttonContainer}>
+            <Button
+              variant={mapVariant(actionButton.variant)}
+              size="md"
+              onPress={onActionClick}
+              className="min-w-[120px]"
+            >
+              <ButtonText variant={mapVariant(actionButton.variant)} size="md">
+                {actionButton.text}
+              </ButtonText>
+            </Button>
+          </View>
         )}
       </View>
     </View>
@@ -57,11 +103,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    minWidth: 200,
   },
   message: {
     marginTop: 16,
     textAlign: 'center',
     color: '#374151',
+    marginBottom: 8,
+  },
+  buttonContainer: {
+    marginTop: 16,
+    width: '100%',
+    alignItems: 'center',
   },
 });
 
