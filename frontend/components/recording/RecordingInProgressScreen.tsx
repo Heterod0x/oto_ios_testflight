@@ -2,7 +2,7 @@ import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { TouchableOpacity } from 'react-native';
 import { formatDuration } from '@/lib/audio';
-import PauseIcon from '@/assets/images/pause.svg';
+import StopIcon from '@/assets/images/stop.svg';
 import PlayIcon from '@/assets/images/play.svg';
 import SaveIcon from '@/assets/images/save.svg';
 import TrashIcon from '@/assets/images/trash.svg';
@@ -67,7 +67,7 @@ export default function RecordingInProgressScreen({
           disabled={!isPlaying}
         >
           {isPlaying ? (
-            <PauseIcon height={28} color="#000000" />
+            <StopIcon height={28} color="#000000" />
           ) : (
             <PlayIcon height={28} color="#9ca3af" />
           )}
