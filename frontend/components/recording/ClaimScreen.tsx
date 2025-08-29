@@ -14,6 +14,7 @@ import FlashMessage, {
 import { useLoading } from '@/contexts/LoadingContext';
 import { useFocusEffect } from 'expo-router';
 import { syncPointsOnServerSide } from '@/lib/point';
+import { navigateToTabs } from '@/lib/session';
 
 export default function ClaimScreen({
   handleClaimComplete,
@@ -45,6 +46,8 @@ export default function ClaimScreen({
             message: err.message,
             isRedirect: false,
           });
+          hideLoading();
+          navigateToTabs('/(tabs)');
         }
       })();
 
