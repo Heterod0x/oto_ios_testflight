@@ -3,14 +3,14 @@ import { fetchPointBalance } from '@/services/api';
 import { PointBalanceResponse } from '@/types/user';
 import { useAuth } from '@/lib/oto-auth';
 
-export default function usePointBalance(deps: any[] = []) {
+export default function usePointBalance(isReady: boolean) {
   const { user, getAccessToken } = useAuth();
   const [data, setData] = useState<PointBalanceResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isReady) return;
     let canceled = false;
     const load = async () => {
       setLoading(true);
@@ -43,7 +43,7 @@ export default function usePointBalance(deps: any[] = []) {
     return () => {
       canceled = true;
     };
-  }, [user, ...deps]);
+  }, [user, isReady]);
 
   return { data, loading, error };
 }

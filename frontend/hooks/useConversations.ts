@@ -27,11 +27,6 @@ export default function useConversations() {
     }
   }, [user, getAccessToken]);
 
-  // Load data on initial mount
-  useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
-
   // Refetch data every time screen comes into focus
   useFocusEffect(
     useCallback(() => {
