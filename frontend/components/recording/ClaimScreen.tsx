@@ -209,7 +209,7 @@ export default function ClaimScreen({
 
       {/* Version */}
       <Text size="sm" weight="medium" className="font-inter text-center">
-        v0.0.1-build.3
+        v0.0.1-build.4
       </Text>
     </>
   );
