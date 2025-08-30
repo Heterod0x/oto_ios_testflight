@@ -367,7 +367,7 @@ export async function syncPoints(
   });
   if (!res.ok) {
     const errorData = await res.json();
-    console.log('errorData', errorData);
+
     throw new Error(
       `HTTP ${res.status}: ${errorData.detail || 'Unknown error'}`
     );

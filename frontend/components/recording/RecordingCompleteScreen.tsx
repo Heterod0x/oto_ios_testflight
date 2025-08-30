@@ -110,7 +110,6 @@ export default function RecordingCompleteScreen({
       playbackDuration &&
       conversation.status === 'completed'
     ) {
-      console.log('hideLoading4');
       hideLoading();
     }
   }, [audioLoading, playbackDuration, conversation]);

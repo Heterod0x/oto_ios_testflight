@@ -37,15 +37,24 @@ export default function ClaimScreen({
       hideMessage();
 
       (async () => {
+        if (isPointsSynced) return;
         const token = (await getAccessToken()) || '';
         try {
           const isSuccess = await syncPointsOnServerSide(user?.id || '', token);
           setIsPointsSynced(isSuccess);
         } catch (err) {
-          setErrorStatus({
-            message: err.message,
-            isRedirect: false,
-          });
+          if (err.includes('Failed to sync points')) {
+            console.log('you are here...');
+            setErrorStatus({
+              message: 'Failed to sync points. Please try again.',
+              isRedirect: true,
+            });
+          } else {
+            setErrorStatus({
+              message: err.message,
+              isRedirect: false,
+            });
+          }
           hideLoading();
           navigateToTabs('/(tabs)');
         }
@@ -63,7 +72,7 @@ export default function ClaimScreen({
     data: pointBalance,
     loading: pointBalanceLoading,
     error: pointBalanceError,
-  } = usePointBalance([isPointsSynced]);
+  } = usePointBalance(isPointsSynced);
 
   useEffect(() => {
     if (pointBalanceError) {
