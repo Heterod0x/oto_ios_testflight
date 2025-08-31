@@ -1,4 +1,5 @@
 import { useLogin } from '@privy-io/expo/ui';
+import { usePrivy } from '@privy-io/expo';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { Box } from '@/components/ui/box';
@@ -10,6 +11,7 @@ import { navigateToTabs } from '@/lib/session';
 
 export default function LoginScreen() {
   const { login } = useLogin();
+  const { logout } = usePrivy();
   const [error, setError] = useState('');
   const { isReady, user } = useAuth();
 
@@ -52,9 +54,14 @@ export default function LoginScreen() {
             size="lg"
             className="w-full mb-4"
             onPress={() =>
-              login({ loginMethods: ['email'] }).catch((err) =>
-                setError(String(err?.message ?? err))
-              )
+              login({ loginMethods: ['email'] }).catch((err) => {
+                logout();
+                setError(
+                  err?.message === 'Privy not ready'
+                    ? 'Please try again'
+                    : String(err?.message ?? err)
+                );
+              })
             }
           >
             <Ionicons
