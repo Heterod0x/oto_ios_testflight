@@ -1,6 +1,5 @@
 {
   "name": "contract",
-  "private": true,
   "version": "1.0.0",
   "main": "index.js",
   "repository": "",
