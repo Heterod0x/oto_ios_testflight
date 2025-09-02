@@ -1,92 +1,92 @@
 # USDC Reward System - Smart Contract
 
-USDC 報酬システムは、会話データをアップロードしたユーザーにポイントベースの報酬を提供するスマートコントラクトです。管理者がユーザーのポイントを管理し、ユーザーがポイントを USDC に交換できる仕組みを実装しています。
+The USDC Reward System is a smart contract that provides point-based rewards to users who upload conversation data. It implements a mechanism where administrators can manage user points, and users can exchange their points for USDC.
 
-## 🌟 主な機能
+## 🌟 Key Features
 
-- **ポイント管理**: 管理者によるユーザーポイントの追加・送金
-- **交換レート設定**: ポイントから USDC への変換レート管理
-- **USDC 請求**: ユーザーによるポイントの USDC 交換
-- **USDC 供給管理**: 管理者によるコントラクト内 USDC 残高管理
-- **アクセス制御**: 管理者権限とセキュリティ機能
-- **一時停止機能**: 緊急時のシステム停止機能
+- **Point Management**: Addition and transfer of user points by administrators
+- **Exchange Rate Configuration**: Management of conversion rates from points to USDC
+- **USDC Claims**: Exchange of points for USDC by users
+- **USDC Supply Management**: Management of USDC balance within the contract by administrators
+- **Access Control**: Administrator privileges and security features
+- **Pause Functionality**: Emergency system shutdown capability
 
-## 🛠️ 技術スタック
+## 🛠️ Tech Stack
 
 - **Solidity**: 0.8.28
-- **フレームワーク**: Hardhat 2.26.1
-- **ライブラリ**: OpenZeppelin Contracts v5.0.0
-- **開発ツール**: Viem, TypeScript, Prettier
-- **ネットワーク**: Base Sepolia (ChainID: 84532)
+- **Framework**: Hardhat 2.26.1
+- **Libraries**: OpenZeppelin Contracts v5.0.0
+- **Development Tools**: Viem, TypeScript, Prettier
+- **Network**: Base Sepolia (ChainID: 84532)
 
-## 📋 前提条件
+## 📋 Prerequisites
 
 - Node.js >= 23
-- Bun (推奨) または npm
-- Base Sepolia テストネット用の ETH
-- USDC トークン（テスト用）
+- Bun (recommended) or npm
+- ETH for Base Sepolia testnet
+- USDC tokens (for testing)
 
-## ⚙️ セットアップ
+## ⚙️ Setup
 
-### 1. 依存関係のインストール
+### 1. Install Dependencies
 
 ```bash
 bun install
 ```
 
-### 2. 環境変数の設定
+### 2. Environment Configuration
 
-`.env`ファイルを作成して以下の値を設定してください：
+Create a `.env` file and set the following values:
 
 ```bash
-# 必須設定
+# Required settings
 PRIVATE_KEY="your-private-key-here"
 MAINNET_PRIVATE_KEY="your-mainnet-key-here"
 ALCHEMY_API_KEY="your-alchemy-api-key"
 USDC_TOKEN_ADDRESS="0x036CbD53842c5426634e7929541eC2318f3dCF7e"  # Base Sepolia USDC
 
-# オプション設定
+# Optional settings
 BASESCAN_API_KEY="your-basescan-api-key"
 ETHERSCAN_API_KEY="your-etherscan-api-key"
 CHAIN_NAME="base-sepolia"
 
-# 初期設定値（オプション）
+# Initial configuration values (optional)
 INITIAL_EXCHANGE_RATE="1000000"      # 1 point = 0.001 USDC
 INITIAL_USDC_DEPOSIT="1000000000"    # 1000 USDC
 
-# デプロイ後の検証用
+# For verification after deployment
 CONTRACT_ADDRESS="deployed-contract-address"
 ```
 
-### 3. コンパイル
+### 3. Compile
 
 ```bash
 bun run compile
 ```
 
-## 🚀 デプロイ
+## 🚀 Deployment
 
-### クイックデプロイ（推奨）
+### Quick Deploy (Recommended)
 
 ```bash
-# ネットワーク毎にUSDCのコントラクトを設定(ここの値はネットワーク毎に切り替える)
-# base sepoliaの場合は以下のアドレスを設定
+# Configure USDC contract address for each network (switch these values per network)
+# For base sepolia, set the following address
 export USDC_TOKEN_ADDRESS=0x036CbD53842c5426634e7929541eC2318f3dCF7e
-# base の場合は以下のアドレスを設定
+# For base mainnet, set the following address
 export USDC_TOKEN_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-# Base Sepoliaに自動デプロイ（初期設定付き）
+# Auto-deploy to Base Sepolia (with initial configuration)
 bun run deploy:full --network base-sepolia
 ```
 
-### デプロイ後に環境変数に設定
+### Set Environment Variable After Deployment
 
 ```bash
-export CONTRACT_ADDRESS=<デプロイしたアドレス>
+export CONTRACT_ADDRESS=<deployed-address>
 ```
 
-さらに、 `deployed_addresses.json` に　 USDC のアドレスを設定する
+Additionally, set the USDC address in `deployed_addresses.json`
 
-以下は base sepolia の場合
+For Base Sepolia:
 
 ```json
 {
@@ -94,7 +94,7 @@ export CONTRACT_ADDRESS=<デプロイしたアドレス>
 }
 ```
 
-以下は base の場合
+For Base Mainnet:
 
 ```json
 {
@@ -102,146 +102,146 @@ export CONTRACT_ADDRESS=<デプロイしたアドレス>
 }
 ```
 
-### コントラクトの検証
+### Contract Verification
 
 ```bash
 bun run verify chain-84532
 ```
 
-詳細なデプロイ手順は [DEPLOYMENT.md](./DEPLOYMENT.md) を参照してください。
+For detailed deployment instructions, refer to [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-## 🧪 テスト
+## 🧪 Testing
 
-### 全テスト実行
+### Run All Tests
 
 ```bash
 bun run test
 ```
 
-### カバレッジ確認
+### Check Coverage
 
 ```bash
 bun run coverage
 ```
 
-## 📖 コントラクトの使用方法
+## 📖 Contract Usage
 
-### 管理者機能
+### Administrator Functions
 
-#### ポイント管理
+#### Point Management
 
 ```bash
-# ユーザーにポイントを追加
+# Add points to a user
 bun run addPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 1000 --network base-sepolia
-# ユーザーからポイントを減算
+# Subtract points from a user
 bun run subtractPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --amount 500 --network base-sepolia
 ```
 
-#### 交換レート設定
+#### Exchange Rate Configuration
 
 ```bash
-# 交換レートを設定（1ポイント = 0.1 USDC）
+# Set exchange rate (1 point = 0.1 USDC)
 bun run setExchangeRate --rate 100000 --network base-sepolia
 ```
 
-#### USDC 供給管理
+#### USDC Supply Management
 
 ```bash
-# コントラクトにUSDCを入金
+# Deposit USDC to contract
 bun run depositUSDC --amount 10 --network base-sepolia
 
-# コントラクトからUSDCを出金
+# Withdraw USDC from contract
 bun run withdrawUSDC --amount 1 --network base-sepolia
 ```
 
-#### システム管理
+#### System Management
 
 ```bash
-# コントラクトを一時停止
+# Pause the contract
 bun run pauseContract --network base-sepolia
 
-# コントラクトの一時停止を解除
+# Unpause the contract
 bun run unpauseContract --network base-sepolia
 
-# 所有権を移転
+# Transfer ownership
 bun run transferOwnership --newowner 0x1431ea8af860C3862A919968C71f901aEdE1910E --network base-sepolia
 ```
 
-### ユーザー機能
+### User Functions
 
-#### 残高確認
+#### Balance Check
 
 ```bash
-# ポイント残高とUSDC残高を確認
+# Check point balance and USDC balance
 bun run getBalances --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --network base-sepolia
 ```
 
-#### USDC 請求
+#### USDC Claim
 
-コントラクトの `claimUSDC` 関数を直接呼び出すか、フロントエンドアプリケーションを通じて実行します。
+Call the contract's `claimUSDC` function directly or execute through a frontend application.
 
 ```bash
-# USDCを請求(デフォルトだと 1ポイント = 1USDC)
+# Claim USDC (default: 1 point = 1 USDC)
 bun run claimUSDC --points 1 --network base-sepolia
 ```
 
-### Claim したポイントの総数を取得する
+### Get Total Claimed Points
 
 ```bash
 bun run getTotalClaimedPoints --user 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 --network base-sepolia
 ```
 
-## 🔧 開発ツール
+## 🔧 Development Tools
 
-### コードフォーマット
+### Code Formatting
 
 ```bash
 bun run format
 ```
 
-### コンパイル
+### Compilation
 
 ```bash
 bun run compile
 ```
 
-### クリーンアップ
+### Cleanup
 
 ```bash
 bun run clean
 ```
 
-### ローカル開発環境
+### Local Development Environment
 
 ```bash
-# ローカルHardhatノードを起動
+# Start local Hardhat node
 bun run local
 
-# 別ターミナルでローカル環境にデプロイ
+# Deploy to local environment in another terminal
 bun run deploy:localhost
 ```
 
-## 📊 コントラクト仕様
+## 📊 Contract Specifications
 
-### 主要関数
+### Main Functions
 
-#### 管理者専用関数
+#### Administrator-Only Functions
 
-- `addPoints(address user, uint256 amount)`: ユーザーにポイントを追加
-- `subtractPoints(address user, uint256 amount)`: ユーザーからポイントを減算
-- `setExchangeRate(uint256 rate)`: 交換レートを設定
-- `depositUSDC(uint256 amount)`: コントラクトに USDC を入金
-- `withdrawUSDC(uint256 amount)`: コントラクトから USDC を出金
-- `pause()`: コントラクトを一時停止
-- `unpause()`: 一時停止を解除
+- `addPoints(address user, uint256 amount)`: Add points to a user
+- `subtractPoints(address user, uint256 amount)`: Subtract points from a user
+- `setExchangeRate(uint256 rate)`: Set exchange rate
+- `depositUSDC(uint256 amount)`: Deposit USDC to contract
+- `withdrawUSDC(uint256 amount)`: Withdraw USDC from contract
+- `pause()`: Pause the contract
+- `unpause()`: Unpause the contract
 
-#### ユーザー関数
+#### User Functions
 
-- `claimUSDC(uint256 pointAmount)`: ポイントを USDC に交換
-- `getPointBalance(address user)`: ポイント残高を確認
-- `calculateUSDCAmount(uint256 pointAmount)`: ポイントに対応する USDC 金額を計算
+- `claimUSDC(uint256 pointAmount)`: Exchange points for USDC
+- `getPointBalance(address user)`: Check point balance
+- `calculateUSDCAmount(uint256 pointAmount)`: Calculate USDC amount corresponding to points
 
-### イベント
+### Events
 
 - `PointsAdded(address indexed user, uint256 amount)`
 - `PointsRemoved(address indexed user, uint256 amount)`
@@ -252,7 +252,7 @@ bun run deploy:localhost
 - `ContractPaused()`
 - `ContractUnpaused()`
 
-### カスタムエラー
+### Custom Errors
 
 - `InsufficientPoints(uint256 required, uint256 available)`
 - `InsufficientUSDCBalance(uint256 required, uint256 available)`
@@ -262,20 +262,20 @@ bun run deploy:localhost
 - `Unauthorized()`
 - `ContractPaused()`
 
-## 🔒 セキュリティ機能
+## 🔒 Security Features
 
-- **アクセス制御**: OpenZeppelin Ownable による管理者権限管理
-- **リエントランシー防止**: ReentrancyGuard による攻撃防止
-- **一時停止機能**: Pausable による緊急停止機能
-- **入力検証**: ゼロアドレス・ゼロ金額の検証
-- **整数オーバーフロー防止**: Solidity 0.8.x の組み込み保護
+- **Access Control**: Administrator privilege management via OpenZeppelin Ownable
+- **Reentrancy Prevention**: Attack prevention via ReentrancyGuard
+- **Pause Functionality**: Emergency stop capability via Pausable
+- **Input Validation**: Validation for zero addresses and zero amounts
+- **Integer Overflow Prevention**: Built-in protection in Solidity 0.8.x
 
-## 🌐 ネットワーク情報
+## 🌐 Network Information
 
-### Base Sepolia（テストネット）
+### Base Sepolia (Testnet)
 
 - **Chain ID**: 84532
-- **RPC URL**: Alchemy 経由
+- **RPC URL**: Via Alchemy
 - **USDC Address**: `0x036CbD53842c5426634e7929541eC2318f3dCF7e`
 - **Explorer**: https://sepolia.basescan.org
 
@@ -285,33 +285,33 @@ bun run deploy:localhost
 - **USDC Address**: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`
 - **Explorer**: https://basescan.org
 
-## 🐛 トラブルシューティング
+## 🐛 Troubleshooting
 
-### よくある問題
+### Common Issues
 
-1. **Chain ID 不一致エラー**
+1. **Chain ID Mismatch Error**
 
    ```bash
    ❌ Chain ID mismatch! Expected: 84532, Actual: 1
    ```
 
-   → 正しいネットワークに接続しているか確認してください
+   → Check if you're connected to the correct network
 
-2. **USDC 残高不足エラー**
+2. **Insufficient USDC Balance Error**
 
    ```bash
    ❌ InsufficientUSDCBalance
    ```
 
-   → コントラクトに USDC を入金してください
+   → Deposit USDC to the contract
 
-3. **権限エラー**
+3. **Authorization Error**
    ```bash
    ❌ Unauthorized
    ```
-   → 管理者アカウントで実行しているか確認してください
+   → Confirm you're executing with the administrator account
 
-## 📚 参考資料
+## 📚 References
 
 - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/)
 - [Hardhat Documentation](https://hardhat.org/docs)

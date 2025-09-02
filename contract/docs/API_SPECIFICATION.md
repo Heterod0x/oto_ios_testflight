@@ -1,84 +1,84 @@
-# USDCRewardContract API 仕様書
+# USDCRewardContract API Specification
 
-## 概要
+## Overview
 
-USDCRewardContract は、会話データをアップロードしたユーザーにポイントベースの報酬を提供するスマートコントラクトです。管理者がユーザーのポイントを管理し、ユーザーがポイントを USDC に交換できる機能を提供します。
+USDCRewardContract is a smart contract that provides point-based rewards to users who upload conversation data. It offers functionality for administrators to manage user points and for users to exchange their points for USDC.
 
-## コントラクト情報
+## Contract Information
 
-- **コントラクト名**: USDCRewardContract
-- **Solidity バージョン**: ^0.8.28
-- **継承**: Ownable, Pausable, ReentrancyGuard
-- **ライセンス**: MIT
+- **Contract Name**: USDCRewardContract
+- **Solidity Version**: ^0.8.28
+- **Inheritance**: Ownable, Pausable, ReentrancyGuard
+- **License**: MIT
 
-## 状態変数
+## State Variables
 
-### プライベート変数
+### Private Variables
 
-| 変数名          | 型                            | 説明                                                                   |
-| --------------- | ----------------------------- | ---------------------------------------------------------------------- |
-| `pointBalances` | `mapping(address => uint256)` | ユーザーアドレスとポイント残高のマッピング                             |
-| `exchangeRate`  | `uint256`                     | ポイントから USDC への交換レート（1 ポイント = exchangeRate USDC wei） |
-| `usdcToken`     | `IERC20`                      | USDC トークンコントラクトのインターフェース                            |
+| Variable Name   | Type                          | Description                                                         |
+| --------------- | ----------------------------- | ------------------------------------------------------------------- |
+| `pointBalances` | `mapping(address => uint256)` | Mapping of user addresses to point balances                         |
+| `exchangeRate`  | `uint256`                     | Exchange rate from points to USDC (1 point = exchangeRate USDC wei) |
+| `usdcToken`     | `IERC20`                      | Interface to the USDC token contract                                |
 
-## 関数仕様
+## Function Specifications
 
-### コンストラクタ
+### Constructor
 
 #### `constructor(address _usdcToken)`
 
-コントラクトを初期化します。
+Initializes the contract.
 
-**パラメータ:**
+**Parameters:**
 
-- `_usdcToken` (address): USDC トークンコントラクトのアドレス
+- `_usdcToken` (address): Address of the USDC token contract
 
-**制約:**
+**Constraints:**
 
-- `_usdcToken`はゼロアドレスであってはならない
+- `_usdcToken` must not be the zero address
 
-**エラー:**
+**Errors:**
 
-- `InvalidAddress()`: USDC トークンアドレスがゼロアドレスの場合
+- `InvalidAddress()`: When USDC token address is the zero address
 
-**初期化:**
+**Initialization:**
 
-- `exchangeRate`は 0 に設定（管理者による設定が必要）
-- デプロイヤーが初期所有者として設定
+- `exchangeRate` is set to 0 (requires administrator configuration)
+- Deployer is set as the initial owner
 
 ---
 
-### ポイント管理関数
+### Point Management Functions
 
 #### `addPoints(address user, uint256 amount)` 🔒
 
-ユーザーのポイント残高を増加させます。
+Increases a user's point balance.
 
-**アクセス制御:** `onlyOwner`
+**Access Control:** `onlyOwner`
 
-**パラメータ:**
+**Parameters:**
 
-- `user` (address): ポイントを追加するユーザーのアドレス
-- `amount` (uint256): 追加するポイント数
+- `user` (address): Address of the user to add points to
+- `amount` (uint256): Number of points to add
 
-**制約:**
+**Constraints:**
 
-- `user`はゼロアドレスであってはならない
-- `amount`は 0 より大きくなければならない
+- `user` must not be the zero address
+- `amount` must be greater than 0
 
-**エラー:**
+**Errors:**
 
-- `InvalidAddress()`: ユーザーアドレスがゼロアドレスの場合
-- `InvalidAmount()`: 金額が 0 の場合
+- `InvalidAddress()`: When user address is the zero address
+- `InvalidAmount()`: When amount is 0
 
-**イベント:**
+**Events:**
 
 - `PointsAdded(address indexed user, uint256 amount)`
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// ユーザーに1000ポイントを追加
+// Add 1000 points to user
 contract.addPoints(0x1234567890123456789012345678901234567890, 1000);
 ```
 
@@ -86,35 +86,35 @@ contract.addPoints(0x1234567890123456789012345678901234567890, 1000);
 
 #### `subtractPoints(address user, uint256 amount)` 🔒
 
-ユーザーのポイント残高を減算します（ポイント減算処理）。
+Subtracts from a user's point balance (point deduction process).
 
-**アクセス制御:** `onlyOwner`
+**Access Control:** `onlyOwner`
 
-**パラメータ:**
+**Parameters:**
 
-- `user` (address): ポイントを減算するユーザーのアドレス
-- `amount` (uint256): 減算するポイント数
+- `user` (address): Address of the user to subtract points from
+- `amount` (uint256): Number of points to subtract
 
-**制約:**
+**Constraints:**
 
-- `user`はゼロアドレスであってはならない
-- `amount`は 0 より大きくなければならない
-- ユーザーの残高は`amount`以上でなければならない
+- `user` must not be the zero address
+- `amount` must be greater than 0
+- User's balance must be at least `amount`
 
-**エラー:**
+**Errors:**
 
-- `InvalidAddress()`: ユーザーアドレスがゼロアドレスの場合
-- `InvalidAmount()`: 金額が 0 の場合
-- `InsufficientPoints(uint256 required, uint256 available)`: ポイント残高不足の場合
+- `InvalidAddress()`: When user address is the zero address
+- `InvalidAmount()`: When amount is 0
+- `InsufficientPoints(uint256 required, uint256 available)`: When point balance is insufficient
 
-**イベント:**
+**Events:**
 
 - `PointsRemoved(address indexed user, uint256 amount)`
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// ユーザーから300ポイントを減算
+// Subtract 300 points from user
 contract.subtractPoints(0x1234567890123456789012345678901234567890, 300);
 ```
 
@@ -122,55 +122,55 @@ contract.subtractPoints(0x1234567890123456789012345678901234567890, 300);
 
 #### `getPointBalance(address user)` 👁️
 
-ユーザーのポイント残高を取得します。
+Retrieves a user's point balance.
 
-**アクセス制御:** なし（view 関数）
+**Access Control:** None (view function)
 
-**パラメータ:**
+**Parameters:**
 
-- `user` (address): 残高を確認するユーザーのアドレス
+- `user` (address): Address of the user to check balance for
 
-**戻り値:**
+**Return Value:**
 
-- `uint256`: ユーザーのポイント残高
+- `uint256`: User's point balance
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// ユーザーのポイント残高を確認
+// Check user's point balance
 uint256 balance = contract.getPointBalance(0x1234567890123456789012345678901234567890);
 ```
 
 ---
 
-### 交換レート管理関数
+### Exchange Rate Management Functions
 
 #### `setExchangeRate(uint256 rate)` 🔒
 
-ポイントから USDC への交換レートを設定します。
+Sets the exchange rate from points to USDC.
 
-**アクセス制御:** `onlyOwner`
+**Access Control:** `onlyOwner`
 
-**パラメータ:**
+**Parameters:**
 
-- `rate` (uint256): 新しい交換レート（1 ポイント = rate USDC wei）
+- `rate` (uint256): New exchange rate (1 point = rate USDC wei)
 
-**注意:**
+**Note:**
 
-- `rate`が 0 の場合、USDC 請求が無効になります
-- USDC は 6 桁の精度を持つため、適切なレート設定が重要です
+- When `rate` is 0, USDC claims become invalid
+- Since USDC has 6 decimal precision, proper rate setting is crucial
 
-**イベント:**
+**Events:**
 
 - `ExchangeRateSet(uint256 newRate)`
 
-**使用例:**
+**Usage Examples:**
 
 ```solidity
-// 1ポイント = 0.001 USDC (1,000,000 wei) に設定
+// Set 1 point = 0.001 USDC (1,000,000 wei)
 contract.setExchangeRate(1000000);
 
-// 1ポイント = 1 USDC (1,000,000,000,000 wei) に設定
+// Set 1 point = 1 USDC (1,000,000,000,000 wei)
 contract.setExchangeRate(1000000000000);
 ```
 
@@ -178,120 +178,120 @@ contract.setExchangeRate(1000000000000);
 
 #### `calculateUSDCAmount(uint256 pointAmount)` 👁️
 
-指定されたポイント数に対応する USDC 金額を計算します。
+Calculates the USDC amount corresponding to the specified number of points.
 
-**アクセス制御:** なし（view 関数）
+**Access Control:** None (view function)
 
-**パラメータ:**
+**Parameters:**
 
-- `pointAmount` (uint256): 変換するポイント数
+- `pointAmount` (uint256): Number of points to convert
 
-**戻り値:**
+**Return Value:**
 
-- `uint256`: 対応する USDC 金額（wei 単位）
+- `uint256`: Corresponding USDC amount (in wei)
 
-**注意:**
+**Note:**
 
-- 交換レートが 0 の場合、常に 0 を返します
+- Returns 0 when exchange rate is 0
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// 1000ポイントに対応するUSDC金額を計算
+// Calculate USDC amount for 1000 points
 uint256 usdcAmount = contract.calculateUSDCAmount(1000);
 ```
 
 ---
 
-### USDC 請求関数
+### USDC Claim Functions
 
 #### `claimUSDC(uint256 pointAmount)` ⏸️🔒
 
-ユーザーがポイントを USDC に交換します。
+Allows users to exchange points for USDC.
 
-**アクセス制御:** `whenNotPaused`, `nonReentrant`
+**Access Control:** `whenNotPaused`, `nonReentrant`
 
-**パラメータ:**
+**Parameters:**
 
-- `pointAmount` (uint256): 交換するポイント数
+- `pointAmount` (uint256): Number of points to exchange
 
-**制約:**
+**Constraints:**
 
-- コントラクトが一時停止されていない
-- `pointAmount`は 0 より大きくなければならない
-- 交換レートが設定されている（0 でない）
-- ユーザーの残高は`pointAmount`以上でなければならない
-- コントラクトの USDC 残高は計算された USDC 金額以上でなければならない
+- Contract must not be paused
+- `pointAmount` must be greater than 0
+- Exchange rate must be set (not 0)
+- User's balance must be at least `pointAmount`
+- Contract's USDC balance must be at least the calculated USDC amount
 
-**エラー:**
+**Errors:**
 
-- `InvalidAddress()`: 呼び出し者がゼロアドレスの場合
-- `InvalidAmount()`: ポイント数が 0 の場合
-- `ExchangeRateNotSet()`: 交換レートが設定されていない場合
-- `InsufficientPoints(uint256 required, uint256 available)`: ポイント残高不足の場合
-- `InsufficientUSDCBalance(uint256 required, uint256 available)`: コントラクトの USDC 残高不足の場合
+- `InvalidAddress()`: When caller is the zero address
+- `InvalidAmount()`: When point amount is 0
+- `ExchangeRateNotSet()`: When exchange rate is not set
+- `InsufficientPoints(uint256 required, uint256 available)`: When point balance is insufficient
+- `InsufficientUSDCBalance(uint256 required, uint256 available)`: When contract's USDC balance is insufficient
 
-**イベント:**
+**Events:**
 
 - `USDCClaimed(address indexed user, uint256 pointsUsed, uint256 usdcAmount)`
 
-**処理フロー:**
+**Process Flow:**
 
-1. 入力値の検証
-2. 交換レートの確認
-3. ユーザーのポイント残高確認
-4. USDC 金額の計算
-5. コントラクトの USDC 残高確認
-6. ユーザーのポイント残高減少
-7. USDC の転送
-8. イベントの発行
+1. Input validation
+2. Exchange rate verification
+3. User point balance verification
+4. USDC amount calculation
+5. Contract USDC balance verification
+6. User point balance reduction
+7. USDC transfer
+8. Event emission
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// 500ポイントをUSDCに交換
+// Exchange 500 points for USDC
 contract.claimUSDC(500);
 ```
 
 ---
 
-### USDC 供給管理関数
+### USDC Supply Management Functions
 
 #### `depositUSDC(uint256 amount)` 🔒
 
-コントラクトに USDC を入金します。
+Deposits USDC into the contract.
 
-**アクセス制御:** `onlyOwner`
+**Access Control:** `onlyOwner`
 
-**パラメータ:**
+**Parameters:**
 
-- `amount` (uint256): 入金する USDC 金額（wei 単位）
+- `amount` (uint256): Amount of USDC to deposit (in wei)
 
-**制約:**
+**Constraints:**
 
-- `amount`は 0 より大きくなければならない
-- 所有者はコントラクトに対して USDC の使用許可を与えている必要があります
+- `amount` must be greater than 0
+- Owner must have approved the contract to spend USDC
 
-**エラー:**
+**Errors:**
 
-- `InvalidAmount()`: 金額が 0 の場合
-- `InsufficientUSDCBalance(uint256 required, uint256 available)`: 所有者の USDC 残高不足または許可不足の場合
+- `InvalidAmount()`: When amount is 0
+- `InsufficientUSDCBalance(uint256 required, uint256 available)`: When owner's USDC balance is insufficient or approval is lacking
 
-**イベント:**
+**Events:**
 
 - `USDCDeposited(uint256 amount)`
 
-**事前準備:**
+**Prerequisites:**
 
 ```solidity
-// 事前にUSDCコントラクトでapproveが必要
+// Prior approval of USDC contract required
 usdcToken.approve(contractAddress, amount);
 ```
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// 1000 USDC (1,000,000,000 wei) を入金
+// Deposit 1000 USDC (1,000,000,000 wei)
 contract.depositUSDC(1000000000);
 ```
 
@@ -299,58 +299,58 @@ contract.depositUSDC(1000000000);
 
 #### `withdrawUSDC(uint256 amount)` 🔒
 
-コントラクトから USDC を出金します。
+Withdraws USDC from the contract.
 
-**アクセス制御:** `onlyOwner`
+**Access Control:** `onlyOwner`
 
-**パラメータ:**
+**Parameters:**
 
-- `amount` (uint256): 出金する USDC 金額（wei 単位）
+- `amount` (uint256): Amount of USDC to withdraw (in wei)
 
-**制約:**
+**Constraints:**
 
-- `amount`は 0 より大きくなければならない
-- コントラクトの USDC 残高は`amount`以上でなければならない
+- `amount` must be greater than 0
+- Contract's USDC balance must be at least `amount`
 
-**エラー:**
+**Errors:**
 
-- `InvalidAmount()`: 金額が 0 の場合
-- `InsufficientUSDCBalance(uint256 required, uint256 available)`: コントラクトの USDC 残高不足の場合
+- `InvalidAmount()`: When amount is 0
+- `InsufficientUSDCBalance(uint256 required, uint256 available)`: When contract's USDC balance is insufficient
 
-**イベント:**
+**Events:**
 
 - `USDCWithdrawn(uint256 amount)`
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// 500 USDC (500,000,000 wei) を出金
+// Withdraw 500 USDC (500,000,000 wei)
 contract.withdrawUSDC(500000000);
 ```
 
 ---
 
-### 一時停止管理関数
+### Pause Management Functions
 
 #### `pause()` 🔒
 
-コントラクトを一時停止します。
+Pauses the contract.
 
-**アクセス制御:** `onlyOwner`
+**Access Control:** `onlyOwner`
 
-**効果:**
+**Effects:**
 
-- `claimUSDC`関数が無効になります
-- 管理者機能は引き続き利用可能です
+- `claimUSDC` function becomes disabled
+- Administrative functions remain available
 
-**イベント:**
+**Events:**
 
 - `ContractPaused()`
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// コントラクトを一時停止
+// Pause the contract
 contract.pause();
 ```
 
@@ -358,296 +358,292 @@ contract.pause();
 
 #### `unpause()` 🔒
 
-コントラクトの一時停止を解除します。
+Unpauses the contract.
 
-**アクセス制御:** `onlyOwner`
+**Access Control:** `onlyOwner`
 
-**効果:**
+**Effects:**
 
-- すべての機能が正常に動作します
+- All functions operate normally
 
-**イベント:**
+**Events:**
 
 - `ContractUnpaused()`
 
-**使用例:**
+**Usage Example:**
 
 ```solidity
-// 一時停止を解除
+// Unpause the contract
 contract.unpause();
 ```
 
 ---
 
-## イベント仕様
+## Event Specifications
 
 ### `PointsAdded(address indexed user, uint256 amount)`
 
-ユーザーにポイントが追加された時に発行されます。
+Emitted when points are added to a user.
 
-**パラメータ:**
+**Parameters:**
 
-- `user` (address, indexed): ポイントが追加されたユーザーのアドレス
-- `amount` (uint256): 追加されたポイント数
+- `user` (address, indexed): Address of the user who received points
+- `amount` (uint256): Number of points added
 
 ---
 
 ### `PointsTransferred(address indexed user, uint256 amount)`
 
-ユーザーからポイントが送金された時に発行されます。
+Emitted when points are transferred from a user.
 
-**パラメータ:**
+**Parameters:**
 
-- `user` (address, indexed): ポイントが送金されたユーザーのアドレス
-- `amount` (uint256): 送金されたポイント数
+- `user` (address, indexed): Address of the user from whom points were transferred
+- `amount` (uint256): Number of points transferred
 
 ---
 
 ### `ExchangeRateSet(uint256 newRate)`
 
-交換レートが設定された時に発行されます。
+Emitted when the exchange rate is set.
 
-**パラメータ:**
+**Parameters:**
 
-- `newRate` (uint256): 新しい交換レート
+- `newRate` (uint256): New exchange rate
 
 ---
 
 ### `USDCClaimed(address indexed user, uint256 pointsUsed, uint256 usdcAmount)`
 
-ユーザーが USDC を請求した時に発行されます。
+Emitted when a user claims USDC.
 
-**パラメータ:**
+**Parameters:**
 
-- `user` (address, indexed): USDC を請求したユーザーのアドレス
-- `pointsUsed` (uint256): 使用されたポイント数
-- `usdcAmount` (uint256): 請求された USDC 金額（wei 単位）
+- `user` (address, indexed): Address of the user who claimed USDC
+- `pointsUsed` (uint256): Number of points used
+- `usdcAmount` (uint256): Amount of USDC claimed (in wei)
 
 ---
 
 ### `USDCDeposited(uint256 amount)`
 
-コントラクトに USDC が入金された時に発行されます。
+Emitted when USDC is deposited into the contract.
 
-**パラメータ:**
+**Parameters:**
 
-- `amount` (uint256): 入金された USDC 金額（wei 単位）
+- `amount` (uint256): Amount of USDC deposited (in wei)
 
 ---
 
 ### `USDCWithdrawn(uint256 amount)`
 
-コントラクトから USDC が出金された時に発行されます。
+Emitted when USDC is withdrawn from the contract.
 
-**パラメータ:**
+**Parameters:**
 
-- `amount` (uint256): 出金された USDC 金額（wei 単位）
+- `amount` (uint256): Amount of USDC withdrawn (in wei)
 
 ---
 
 ### `ContractPaused()`
 
-コントラクトが一時停止された時に発行されます。
+Emitted when the contract is paused.
 
-**パラメータ:** なし
+**Parameters:** None
 
 ---
 
 ### `ContractUnpaused()`
 
-コントラクトの一時停止が解除された時に発行されます。
+Emitted when the contract is unpaused.
 
-**パラメータ:** なし
+**Parameters:** None
 
 ---
 
-## エラー仕様
+## Error Specifications
 
 ### `InsufficientPoints(uint256 required, uint256 available)`
 
-ユーザーのポイント残高が不足している場合に発生します。
+Occurs when a user's point balance is insufficient.
 
-**パラメータ:**
+**Parameters:**
 
-- `required` (uint256): 必要なポイント数
-- `available` (uint256): 利用可能なポイント数
+- `required` (uint256): Required number of points
+- `available` (uint256): Available number of points
 
 ---
 
 ### `InsufficientUSDCBalance(uint256 required, uint256 available)`
 
-USDC 残高が不足している場合に発生します。
+Occurs when USDC balance is insufficient.
 
-**パラメータ:**
+**Parameters:**
 
-- `required` (uint256): 必要な USDC 金額
-- `available` (uint256): 利用可能な USDC 金額
+- `required` (uint256): Required USDC amount
+- `available` (uint256): Available USDC amount
 
 ---
 
 ### `InvalidAddress()`
 
-無効なアドレス（ゼロアドレス）が提供された場合に発生します。
+Occurs when an invalid address (zero address) is provided.
 
-**パラメータ:** なし
+**Parameters:** None
 
 ---
 
 ### `InvalidAmount()`
 
-無効な金額（0 以下）が提供された場合に発生します。
+Occurs when an invalid amount (0 or less) is provided.
 
-**パラメータ:** なし
+**Parameters:** None
 
 ---
 
 ### `ExchangeRateNotSet()`
 
-交換レートが設定されていない（0）場合に発生します。
+Occurs when the exchange rate is not set (0).
 
-**パラメータ:** なし
+**Parameters:** None
 
 ---
 
 ### `Unauthorized()`
 
-権限のないアクセスが試行された場合に発生します。
+Occurs when unauthorized access is attempted.
 
-**パラメータ:** なし
+**Parameters:** None
 
 ---
 
 ### `ContractIsPaused()`
 
-コントラクトが一時停止中に制限された操作が試行された場合に発生します。
+Occurs when restricted operations are attempted while the contract is paused.
 
-**パラメータ:** なし
+**Parameters:** None
 
 ---
 
-## 使用例とワークフロー
+## Usage Examples and Workflows
 
-### 基本的なワークフロー
+### Basic Workflow
 
-#### 1. コントラクトのデプロイと初期設定
+#### 1. Contract Deployment and Initial Setup
 
 ```solidity
-// 1. コントラクトをデプロイ
+// 1. Deploy the contract
 USDCRewardContract contract = new USDCRewardContract(usdcTokenAddress);
 
-// 2. 交換レートを設定（1ポイント = 0.001 USDC）
+// 2. Set exchange rate (1 point = 0.001 USDC)
 contract.setExchangeRate(1000000);
 
-// 3. USDCを入金（事前にapprove必要）
+// 3. Deposit USDC (prior approval required)
 usdcToken.approve(address(contract), 1000000000); // 1000 USDC
 contract.depositUSDC(1000000000);
 ```
 
-#### 2. ユーザーへのポイント付与
+#### 2. Granting Points to Users
 
 ```solidity
-// ユーザーに1000ポイントを付与
+// Grant 1000 points to user
 contract.addPoints(userAddress, 1000);
 
-// ユーザーの残高を確認
+// Check user's balance
 uint256 balance = contract.getPointBalance(userAddress);
 ```
 
-#### 3. ユーザーによる USDC 請求
+#### 3. User USDC Claims
 
 ```solidity
-// ユーザーが500ポイントをUSDCに交換
+// User exchanges 500 points for USDC
 contract.claimUSDC(500);
 
-// 交換後の残高を確認
+// Check balance after exchange
 uint256 newBalance = contract.getPointBalance(userAddress);
 ```
 
-### 管理者操作の例
+### Administrative Operations Examples
 
-#### 緊急時の一時停止
+#### Emergency Pause
 
 ```solidity
-// コントラクトを一時停止
+// Pause the contract
 contract.pause();
 
-// 問題解決後、一時停止を解除
+// After issue resolution, unpause
 contract.unpause();
 ```
 
-#### USDC 供給の管理
+#### USDC Supply Management
 
 ```solidity
-// 追加のUSDCを入金
+// Deposit additional USDC
 usdcToken.approve(address(contract), 500000000); // 500 USDC
 contract.depositUSDC(500000000);
 
-// 余剰USDCを出金
+// Withdraw excess USDC
 contract.withdrawUSDC(100000000); // 100 USDC
 ```
 
-### エラーハンドリングの例
+### Error Handling Examples
 
 ```javascript
-// JavaScript/TypeScript での例
+// JavaScript/TypeScript example
 try {
   await contract.claimUSDC(1000);
 } catch (error) {
   if (error.message.includes("InsufficientPoints")) {
-    console.log("ポイント残高が不足しています");
+    console.log("Insufficient point balance");
   } else if (error.message.includes("InsufficientUSDCBalance")) {
-    console.log("コントラクトのUSDC残高が不足しています");
+    console.log("Contract has insufficient USDC balance");
   } else if (error.message.includes("ExchangeRateNotSet")) {
-    console.log("交換レートが設定されていません");
+    console.log("Exchange rate is not set");
   }
 }
 ```
 
-## セキュリティ考慮事項
+## Security Considerations
 
-### アクセス制御
+### Access Control
 
-- **所有者権限**: 重要な管理機能は`onlyOwner`修飾子で保護
-- **一時停止機能**: 緊急時にユーザー機能を無効化可能
-- **リエントランシー防止**: `nonReentrant`修飾子でリエントランシー攻撃を防止
+- **Owner Privileges**: Critical management functions protected by `onlyOwner` modifier
+- **Pause Functionality**: Ability to disable user functions in emergencies
+- **Reentrancy Prevention**: `nonReentrant` modifier prevents reentrancy attacks
 
-### 入力検証
+### Input Validation
 
-- **ゼロアドレス検証**: すべてのアドレス入力を検証
-- **ゼロ金額検証**: すべての金額入力を検証
-- **残高チェック**: 操作前に十分な残高があることを確認
+- **Zero Address Validation**: All address inputs are validated
+- **Zero Amount Validation**: All amount inputs are validated
+- **Balance Checks**: Sufficient balance verification before operations
 
-### 整数オーバーフロー
+### Integer Overflow
 
-- Solidity 0.8.x の組み込み保護により自動的に防止
+- Automatically prevented by Solidity 0.8.x built-in protection
 
-## ガス使用量の目安
+## Estimated Gas Usage
 
-| 関数              | 推定ガス使用量 |
-| ----------------- | -------------- |
-| `addPoints`       | ~45,000        |
-| `subtractPoints`  | ~30,000        |
-| `setExchangeRate` | ~25,000        |
-| `claimUSDC`       | ~80,000        |
-| `depositUSDC`     | ~60,000        |
-| `withdrawUSDC`    | ~55,000        |
-| `pause/unpause`   | ~25,000        |
+| Function          | Estimated Gas Usage |
+| ----------------- | ------------------- |
+| `addPoints`       | ~45,000             |
+| `subtractPoints`  | ~30,000             |
+| `setExchangeRate` | ~25,000             |
+| `claimUSDC`       | ~80,000             |
+| `depositUSDC`     | ~60,000             |
+| `withdrawUSDC`    | ~55,000             |
+| `pause/unpause`   | ~25,000             |
 
-_注意: ガス使用量は実際の条件により変動する可能性があります。_
+_Note: Gas usage may vary depending on actual conditions._
 
-## 互換性
+## Compatibility
 
 - **Solidity**: ^0.8.28
 - **OpenZeppelin**: ^5.0.0
-- **ERC20**: IERC20 インターフェース準拠のトークン
-- **ネットワーク**: Ethereum 互換のすべてのネットワーク
+- **ERC20**: Compatible with IERC20 interface-compliant tokens
+- **Networks**: All Ethereum-compatible networks
 
-## 更新履歴
+## Update History
 
-| バージョン | 日付       | 変更内容     |
-| ---------- | ---------- | ------------ |
-| 1.0.0      | 2025-08-15 | 初回リリース |
-
----
-
-_この仕様書は USDCRewardContract v1.0.0 に基づいています。最新の情報については、コントラクトのソースコードを参照してください。_
+| Version | Date       | Changes         |
+| ------- | ---------- | --------------- |
+| 1.0.0   | 2025-08-15 | Initial release |
