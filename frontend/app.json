@@ -19,7 +19,8 @@
         "image": "./assets/images/splash-icon.png",
         "resizeMode": "contain",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "buildNumber": "4"
     },
     "web": {
       "bundler": "metro",
