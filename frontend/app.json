@@ -2,61 +2,96 @@
   "expo": {
     "name": "oto-app",
     "slug": "oto",
-    "version": "0.0.1",
-    "orientation": "portrait",
-    "icon": "./assets/images/oto-bg-white-logo.png",
-    "scheme": "otoapp",
-    "userInterfaceStyle": "automatic",
+    "version": "1.0.0",
     "newArchEnabled": true,
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "otoapp",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
+      "bitcode": false,
       "bundleIdentifier": "earth.oto.app",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio for voice analysis and transcription."
-      },
-      "icon": "./assets/images/oto-bg-white-logo.png",
-      "splash": {
-        "image": "./assets/images/splash-icon.png",
-        "resizeMode": "contain",
-        "backgroundColor": "#ffffff"
+        "UIBackgroundModes": ["voip"]
       }
     },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "earth.oto.app",
+      "permissions": [
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.BLUETOOTH",
+        "android.permission.CAMERA",
+        "android.permission.INTERNET",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_CAMERA",
+        "android.permission.FOREGROUND_SERVICE_MICROPHONE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
+        "android.permission.POST_NOTIFICATIONS"
+      ]
+    },
     "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "privyAppId": "cmcc0wydx0086js0l5e5gj35e",
-      "privyClientId": "client-WY6N2jYhjSc3MBZXJinPQz9XWMUCQsJie5DXhXSBMz9WP",
+      "functionsBaseUrl": "https://us-central1-conversation-collector-call.cloudfunctions.net",
+      "dailyDomain": "https://xohfhubtncdaieqr.daily.co",
+      "firebase": {
+        "apiKey": "AIzaSyAgXuIFv_GK7tI7ZOX2RpbBqFUR94lXDtE",
+        "authDomain": "",
+        "projectId": "conversation-collector-call",
+        "storageBucket": "conversation-collector-call.firebasestorage.app",
+        "messagingSenderId": "563244398169",
+        "appId": "1:563244398169:ios:81680bcb184c4c78d8e348",
+        "measurementId": ""
+      },
       "eas": {
         "projectId": "4dd98174-a84b-40e7-9aff-02d7e312d2b9"
       }
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      "expo-secure-store",
-      "expo-web-browser",
-      "expo-font"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
     "updates": {
       "url": "https://u.expo.dev/4dd98174-a84b-40e7-9aff-02d7e312d2b9"
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    }
-  },
-  "owner": "leq6c"
+    "plugins": [
+      [
+        "@daily-co/config-plugin-rn-daily-js",
+        {
+          "enableCamera": true,
+          "enableMicrophone": true,
+          "enableScreenShare": false
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 24,
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ]
+    ]
+  }
 }
