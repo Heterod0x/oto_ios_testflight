@@ -22,7 +22,9 @@
       "bitcode": false,
       "bundleIdentifier": "earth.oto.app",
       "infoPlist": {
-        "UIBackgroundModes": ["voip"]
+        "UIBackgroundModes": ["voip"],
+        "NSMicrophoneUsageDescription": "This app needs access to your microphone to record audio.",
+	"NSCameraUsageDescription": "This app needs access to your camera to record video."
       }
     },
     "android": {
