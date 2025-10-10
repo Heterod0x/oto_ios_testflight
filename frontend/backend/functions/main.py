@@ -229,8 +229,6 @@ def record_call_history(req: https_fn.Request) -> https_fn.Response:
     meetings = daily_client.get_meetings(daily_room_id)
 
     for meeting in meetings.data:
-        if meeting.ongoing:
-            continue
         if len(meeting.participants) < 2:
             continue
 

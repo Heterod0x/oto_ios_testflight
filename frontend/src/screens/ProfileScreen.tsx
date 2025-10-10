@@ -100,6 +100,9 @@ export const ProfileScreen: React.FC = () => {
                 <Text style={styles.pointsCaption}>
                   通話を行うことでポイントが貯まります。
                 </Text>
+                <Text style={styles.pointsCaption}>
+                  v1.0.1
+                </Text>
               </View>
               <View style={styles.logoutButton}>
                 <SecondaryButton
