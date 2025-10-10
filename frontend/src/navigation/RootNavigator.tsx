@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useRef } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer, NavigationContainerRef } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
 import { FriendsScreen } from "../screens/FriendsScreen";
@@ -9,12 +9,14 @@ import { ProfileScreen } from "../screens/ProfileScreen";
 import { colors } from "../theme/colors";
 import type { RootTabParamList } from "./types";
 import { useCall } from "../contexts/CallContext";
+import { useProximity } from "expo-proximity";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 export const RootNavigator: React.FC = () => {
   const { callStatus } = useCall();
   const inCall = callStatus !== "idle";
+  const { proximityState } = useProximity();
 
   const navigationTheme = {
     ...DefaultTheme,
@@ -39,6 +41,7 @@ export const RootNavigator: React.FC = () => {
             paddingVertical: 6,
             height:86,
             paddingTop: 6,
+            opacity: proximityState && route.name === "ActiveCall" ? 0 : 1,
           },
           tabBarActiveTintColor: colors.textPrimary,
           tabBarInactiveTintColor: colors.textSecondary,
@@ -79,6 +82,9 @@ export const RootNavigator: React.FC = () => {
               color: colors.primaryLight,
               fontSize: 14,
             },
+            sceneStyle: {
+              opacity: proximityState ? 0 : 1,
+            }
           }}
         />
         <Tab.Screen

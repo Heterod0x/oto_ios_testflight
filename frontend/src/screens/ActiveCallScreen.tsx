@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   SafeAreaView,
@@ -15,6 +15,8 @@ import { colors } from "../theme/colors";
 import { spacing } from "../theme/spacing";
 import { useCallTimer } from "../hooks/useCallTimer";
 import { formatDuration } from "../utils/time";
+import { useProximity } from "expo-proximity";
+import { StatusBar } from "expo-status-bar";
 
 const statusLabelMap = {
   idle: "待機中",
@@ -32,13 +34,14 @@ export const ActiveCallScreen: React.FC = () => {
     toggleMute,
     endCall,
   } = useCall();
+  const { proximityState } = useProximity();
 
   const elapsedSeconds = useCallTimer(
     currentSession?.startedAt ?? null,
     callStatus
   );
 
-  if (!currentSession) {
+  if (!currentSession && false) {
     return (
       <LinearGradient
         colors={[colors.surface, colors.background]}
@@ -54,7 +57,15 @@ export const ActiveCallScreen: React.FC = () => {
     );
   }
 
-  const friend = currentSession.friend;
+  const friend = currentSession?.friend ?? {
+    id: "123",
+    name: "テストユーザー",
+    avatarColor: "red",
+    photoUrl: "https://via.placeholder.com/150",
+    roomId: "123",
+    waiting: false,
+    createdAt: 1718035200,
+  };
   const statusLabel = statusLabelMap[callStatus];
   const remoteStatusText =
     remoteParticipantCount > 0
@@ -62,11 +73,18 @@ export const ActiveCallScreen: React.FC = () => {
       : callStatus === "connected"
       ? "相手の参加を待っています…"
       : "準備しています...";
+    
+  
+  if (proximityState) {
+    return <View style={{ backgroundColor: "black", flex: 1 }}>
+      <StatusBar hidden={true}/>
+    </View>;
+  }
 
   return (
     <LinearGradient
       colors={[colors.surface, colors.background]}
-      style={StyleSheet.absoluteFill}
+      style={[StyleSheet.absoluteFill]}
     >
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>

@@ -21,6 +21,7 @@
     "expo-clipboard": "~7.1.5",
     "expo-dev-client": "~5.2.0",
     "expo-linear-gradient": "~14.1.5",
+    "expo-proximity": "^1.1.0",
     "expo-splash-screen": "~0.30.9",
     "expo-status-bar": "~2.2.3",
     "firebase": "^12.3.0",
