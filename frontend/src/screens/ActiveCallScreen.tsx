@@ -1,11 +1,14 @@
 import React, { useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
+  Button,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
 import { Avatar } from "../components/Avatar";
 import { CallControlButton } from "../components/CallControlButton";
@@ -101,12 +104,19 @@ export const ActiveCallScreen: React.FC = () => {
             <Text style={styles.remoteStatus}>{remoteStatusText}</Text>
           </View>
           <View style={styles.controls}>
-            <CallControlButton
-              icon={isMuted ? "mic-off" : "mic"}
-              onPress={toggleMute}
-              variant="mute"
-              active={isMuted}
-            />
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <CallControlButton
+                icon={isMuted ? "mic-off" : "mic"}
+                onPress={toggleMute}
+                variant="mute"
+                active={isMuted}
+              />
+              {/*
+              <Pressable>
+                <Feather style={{marginLeft: 8}} name="chevron-down" size={24} color={colors.textSecondary}/>
+              </Pressable>
+              */}
+            </View>
             <CallControlButton
               icon="phone-off"
               onPress={endCall}

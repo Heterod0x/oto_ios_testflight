@@ -27,6 +27,7 @@ import { buildDailyRoomUrl } from "../config/env";
 import { db } from "../services/firebase";
 
 type CallContextValue = {
+  callObject: DailyCall | null;
   callStatus: CallStatus;
   currentSession: CallSession | null;
   remoteParticipantCount: number;
@@ -37,6 +38,7 @@ type CallContextValue = {
 };
 
 type InternalCallState = {
+  callObject: DailyCall | null;
   status: CallStatus;
   friend: FriendProfile | null;
   roomId: string | null;
@@ -47,6 +49,7 @@ type InternalCallState = {
 };
 
 const initialState: InternalCallState = {
+  callObject: null,
   status: "idle",
   friend: null,
   roomId: null,
@@ -262,6 +265,7 @@ export const CallProvider: React.FC<React.PropsWithChildren> = ({
         friend.activeCall?.startedAt ?? callStateRef.current.startedAt ?? null;
 
       setState({
+        callObject,
         status: "connecting",
         friend,
         roomId,
@@ -372,6 +376,7 @@ export const CallProvider: React.FC<React.PropsWithChildren> = ({
 
   const value = useMemo<CallContextValue>(
     () => ({
+      callObject: state.callObject,
       callStatus: state.status,
       currentSession,
       remoteParticipantCount: state.remoteParticipantCount,
@@ -382,6 +387,7 @@ export const CallProvider: React.FC<React.PropsWithChildren> = ({
     }),
     [
       currentSession,
+      callObjectRef.current,
       endCall,
       startCall,
       state.isMuted,
