@@ -41,7 +41,7 @@ export const ActiveCallScreen: React.FC = () => {
     callStatus
   );
 
-  if (!currentSession && false) {
+  if (!currentSession) {
     return (
       <LinearGradient
         colors={[colors.surface, colors.background]}
