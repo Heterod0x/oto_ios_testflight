@@ -17,8 +17,8 @@ class DailyMeeting(BaseModel):
 
 
 class DailyParticipant(BaseModel):
-    user_id: str | None
+    user_id: str | None = None
     participant_id: str
-    user_name: str
+    user_name: str | None = None
     join_time: int
     duration: int

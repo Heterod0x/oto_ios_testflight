@@ -43,11 +43,7 @@ class DailyClient:
         if expires_at is not None:
             properties["exp"] = int(expires_at.timestamp())
 
-        if (
-            self.bucket_name
-            and self.bucket_region
-            and self.assume_role_arn
-        ):
+        if self.bucket_name and self.bucket_region and self.assume_role_arn:
             properties["recordings_bucket"] = {
                 "bucket_name": self.bucket_name,
                 "bucket_region": self.bucket_region,
@@ -109,4 +105,5 @@ class DailyClient:
         response = requests.get(url, params={"room": room_name}, headers=self.headers)
         if response.status_code != 200:
             raise Exception(response.json())
+        print(response.text)
         return DailyMeetingResponse.model_validate_json(response.text, strict=False)

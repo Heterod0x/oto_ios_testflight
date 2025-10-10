@@ -11,19 +11,15 @@ import Daily, {
   DailyCall,
   DailyEventObjectParticipant,
 } from "@daily-co/react-native-daily-js";
-import {
-  addDoc,
-  collection,
-  doc,
-  increment,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 
 import type { CallSession, CallStatus, FriendProfile } from "../types";
 import { useAuth } from "./AuthContext";
-import { buildDailyRoomUrl } from "../config/env";
+import {
+  buildDailyRoomUrl,
+  functionsBaseUrl,
+  hasValidFunctionsBaseUrl,
+} from "../config/env";
 import { db } from "../services/firebase";
 
 type CallContextValue = {
@@ -112,67 +108,51 @@ export const CallProvider: React.FC<React.PropsWithChildren> = ({
   const recordCallHistory = useCallback(
     async (endedAt: number) => {
       const { friend, startedAt, roomId } = callStateRef.current;
-      if (!user || !friend || !startedAt) {
+      if (!user || !friend || !startedAt || !roomId) {
         return;
       }
       if (hasRecordedRef.current) {
         return;
       }
       hasRecordedRef.current = true;
-      const durationSeconds = Math.max(
-        Math.round((endedAt - startedAt) / 1000),
-        0
-      );
-      const pointsEarned = Math.max(Math.floor(durationSeconds / 30), 1) * 5;
 
-      const isPrimaryRecorder = user.id < friend.id;
-      const cleanupTasks: Promise<unknown>[] = [
-        setFriendWaitingStatus(friend.id, false),
-      ];
-
-      if (!isPrimaryRecorder) {
-        cleanupTasks.push(
-          updateDoc(doc(db, "users", user.id), {
-            activeCall: null,
-          })
+      if (!hasValidFunctionsBaseUrl) {
+        console.warn(
+          "Functions base URL is not configured; skipping call history."
         );
-        await Promise.all(cleanupTasks);
         return;
       }
 
-      const baseHistory = {
-        roomId,
-        peerId: friend.id,
-        peerName: friend.name,
-        startedAt,
-        endedAt,
-        durationSeconds,
-        pointsEarned,
-        createdAt: serverTimestamp(),
-      };
+      try {
+        const response = await fetch(`${functionsBaseUrl}/record_call_history`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user.id,
+          },
+          body: JSON.stringify({
+            friendId: friend.id,
+            roomId,
+          }),
+        });
 
-      const userHistoryRef = collection(db, "users", user.id, "callHistory");
-      const friendHistoryRef = collection(db, "users", friend.id, "callHistory");
-
-      await Promise.all([
-        addDoc(userHistoryRef, baseHistory),
-        addDoc(friendHistoryRef, {
-          ...baseHistory,
-          peerId: user.id,
-          peerName: user.name,
-        }),
-        updateDoc(doc(db, "users", user.id), {
-          points: increment(pointsEarned),
-          activeCall: null,
-        }),
-        updateDoc(doc(db, "users", friend.id), {
-          points: increment(pointsEarned),
-          activeCall: null,
-        }),
-        ...cleanupTasks,
-      ]);
+        if (!response.ok) {
+          let message = "Failed to record call history.";
+          try {
+            const errorBody = await response.json();
+            if (typeof errorBody?.error === "string") {
+              message = errorBody.error;
+            }
+          } catch {
+            // ignore parse errors
+          }
+          console.warn(message);
+        }
+      } catch (error) {
+        console.warn("Failed to record call history", error);
+      }
     },
-    [setFriendWaitingStatus, user]
+    [user]
   );
 
   const resetCall = useCallback(async () => {
